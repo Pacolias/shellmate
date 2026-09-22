@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Terminal } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import type { CommandAnalysis } from '@shared/types/command';
@@ -19,6 +19,18 @@ export interface UseTerminalOptions {
   onConfirmDestructive: (details: ConfirmDestructiveDetails) => Promise<boolean>;
 }
 
+export interface UseTerminalHandle {
+  /**
+   * Feeds text into the terminal exactly as if it had been typed, one
+   * character at a time through the same path real keystrokes take — so a
+   * recipe run from the history diary gets the same live danger analysis
+   * and destructive-command confirmation as anything the user types by
+   * hand. Deliberately does not send Enter — the user still has to submit
+   * it themselves.
+   */
+  insertText: (text: string) => Promise<void>;
+}
+
 /**
  * Owns the xterm.js instance and its connection to the real pty over the
  * shellmate bridge: writes keystrokes through, renders incoming data, keeps
@@ -29,9 +41,10 @@ export interface UseTerminalOptions {
 export function useTerminal(
   containerRef: React.RefObject<HTMLDivElement | null>,
   options: UseTerminalOptions,
-): void {
+): UseTerminalHandle {
   const optionsRef = useRef(options);
   optionsRef.current = options;
+  const handleInputRef = useRef<((input: string) => Promise<void>) | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -78,6 +91,8 @@ export function useTerminal(
       void handleInput(input);
     });
 
+    handleInputRef.current = handleInput;
+
     async function handleInput(input: string): Promise<void> {
       const isEnter = input === '\r' || input === '\n';
 
@@ -112,6 +127,7 @@ export function useTerminal(
     resizeObserver.observe(container);
 
     return () => {
+      handleInputRef.current = null;
       resizeObserver.disconnect();
       inputDisposable.dispose();
       offData();
@@ -120,4 +136,12 @@ export function useTerminal(
       terminal.dispose();
     };
   }, [containerRef]);
+
+  const insertText = useCallback(async (text: string) => {
+    for (const char of text) {
+      await handleInputRef.current?.(char);
+    }
+  }, []);
+
+  return { insertText };
 }

@@ -22,6 +22,10 @@
   color: var(--color-text-secondary);
 }
 
+.headerSpacer {
+  flex: 1;
+}
+
 .columns {
   flex: 1;
   min-height: 0;

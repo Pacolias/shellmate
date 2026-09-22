@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import es from '@shared/i18n/es.json';
+import { HelpLevelSlider } from './HelpLevelSlider';
 import styles from './ThreeColumnLayout.module.css';
 
 export interface ThreeColumnLayoutProps {
@@ -13,6 +14,8 @@ export function ThreeColumnLayout({ contextColumn, terminalColumn, copilotColumn
     <div className={styles.app}>
       <header className={styles.header}>
         <span className={styles.wordmark}>{es.app.title}</span>
+        <div className={styles.headerSpacer} />
+        <HelpLevelSlider />
       </header>
       <div className={styles.columns}>
         <aside className={styles.side}>{contextColumn}</aside>

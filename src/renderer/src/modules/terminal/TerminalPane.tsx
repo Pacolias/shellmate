@@ -1,19 +1,24 @@
 import '@xterm/xterm/css/xterm.css';
-import { useCallback, useRef, useState } from 'react';
+import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
 import type { CommandAnalysis, DangerLevel } from '@shared/types/command';
 import { ConfirmDestructiveDialog } from './ConfirmDestructiveDialog';
 import styles from './TerminalPane.module.css';
-import { type ConfirmDestructiveDetails, useTerminal } from './useTerminal';
+import { type ConfirmDestructiveDetails, type UseTerminalHandle, useTerminal } from './useTerminal';
 
 export interface TerminalPaneProps {
   onAnalysisChange: (analysis: CommandAnalysis | null) => void;
 }
 
+export type TerminalPaneHandle = UseTerminalHandle;
+
 interface PendingConfirmation extends ConfirmDestructiveDetails {
   resolve: (confirmed: boolean) => void;
 }
 
-export function TerminalPane({ onAnalysisChange }: TerminalPaneProps) {
+export const TerminalPane = forwardRef<TerminalPaneHandle, TerminalPaneProps>(function TerminalPane(
+  { onAnalysisChange },
+  ref,
+) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dangerLevel, setDangerLevel] = useState<DangerLevel | null>(null);
   const [pendingConfirmation, setPendingConfirmation] = useState<PendingConfirmation | null>(null);
@@ -32,10 +37,12 @@ export function TerminalPane({ onAnalysisChange }: TerminalPaneProps) {
     });
   }, []);
 
-  useTerminal(containerRef, {
+  const terminalHandle = useTerminal(containerRef, {
     onAnalysisChange: handleAnalysisChange,
     onConfirmDestructive: handleConfirmDestructive,
   });
+
+  useImperativeHandle(ref, () => terminalHandle, [terminalHandle]);
 
   const resolveConfirmation = (confirmed: boolean): void => {
     pendingConfirmation?.resolve(confirmed);
@@ -57,4 +64,4 @@ export function TerminalPane({ onAnalysisChange }: TerminalPaneProps) {
       )}
     </div>
   );
-}
+});

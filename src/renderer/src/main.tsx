@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { HelpLevelProvider } from './app-state/HelpLevelContext';
 import { App } from './App';
 import './theme/global.css';
 
@@ -10,6 +11,8 @@ if (!container) {
 
 createRoot(container).render(
   <StrictMode>
-    <App />
+    <HelpLevelProvider>
+      <App />
+    </HelpLevelProvider>
   </StrictMode>,
 );

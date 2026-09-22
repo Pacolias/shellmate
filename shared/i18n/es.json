@@ -18,11 +18,13 @@
   "copilot": {
     "subtitles": {
       "title": "Subtítulos",
-      "emptyState": "Escribe un comando en la terminal para ver aquí una explicación en lenguaje sencillo."
+      "emptyState": "Escribe un comando en la terminal para ver aquí una explicación en lenguaje sencillo.",
+      "hiddenAtLowHelp": "Los subtítulos detallados están ocultos a este nivel de ayuda."
     },
     "errors": {
       "title": "Errores traducidos",
-      "emptyState": "Cuando un comando falle, aquí verás qué ha pasado y cómo solucionarlo."
+      "emptyState": "Cuando un comando falle, aquí verás qué ha pasado y cómo solucionarlo.",
+      "minimalAtLowHelp": "Ha fallado un comando. Revisa la salida en la terminal."
     },
     "cheatsheet": {
       "title": "Chuleta de ejemplos",
@@ -36,14 +38,24 @@
   "context": {
     "map": {
       "title": "Mapa del sistema de archivos",
-      "comingSoon": "Disponible en la fase 2."
+      "emptyState": "Esperando a saber en qué carpeta estás…",
+      "youAreHere": "Estás aquí",
+      "hiddenAtLowHelp": "El mapa está oculto a este nivel de ayuda."
     },
     "history": {
       "title": "Historial como diario",
-      "comingSoon": "Disponible en la fase 2."
+      "emptyState": "Los comandos que ejecutes aparecerán aquí.",
+      "diaryTitle": "Últimos comandos",
+      "recipesTitle": "Recetas guardadas",
+      "saveAsRecipe": "Guardar como receta",
+      "recipeNamePrompt": "¿Cómo quieres llamar a esta receta?",
+      "run": "Ejecutar",
+      "cancel": "Cancelar",
+      "save": "Guardar"
     }
   },
   "helpLevel": {
+    "label": "Nivel de ayuda",
     "high": "Alto",
     "medium": "Medio",
     "low": "Bajo"

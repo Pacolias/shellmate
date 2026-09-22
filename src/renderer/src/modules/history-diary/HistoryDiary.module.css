@@ -1,0 +1,165 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.heading {
+  margin: 0 0 var(--space-3);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.emptyState {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.recipeItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--color-bg-sunken);
+  border-radius: var(--radius-sm);
+}
+
+.recipeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.recipeName {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.runButton {
+  flex-shrink: 0;
+  border: 1px solid var(--color-accent);
+  background: transparent;
+  color: var(--color-accent);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.runButton:hover {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+.diaryItem {
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  border-left: 2px solid transparent;
+}
+
+.diaryItem[data-failed] {
+  border-left-color: var(--color-danger-destructive);
+}
+
+.diaryMain {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.command,
+.recipeItem .command {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.label {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.saveRecipeButton {
+  margin-top: 4px;
+  border: none;
+  background: transparent;
+  color: var(--color-accent);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 0;
+  cursor: pointer;
+}
+
+.saveRecipeButton:hover {
+  text-decoration: underline;
+}
+
+.namingRow {
+  margin-top: var(--space-2);
+  display: flex;
+  gap: var(--space-1);
+}
+
+.nameInput {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-panel);
+  color: var(--color-text-primary);
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.namingRow button {
+  border: 1px solid var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  cursor: pointer;
+}

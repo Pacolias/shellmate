@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CommandFailedEvent } from '@shared/ipc-contract';
 import type { CommandAnalysis } from '@shared/types/command';
 import { ThreeColumnLayout } from './layout/ThreeColumnLayout';
@@ -6,27 +6,32 @@ import { CheatsheetPlaceholder } from './modules/copilot-cheatsheet/CheatsheetPl
 import { ErrorCard } from './modules/copilot-errors/ErrorCard';
 import { NaturalLanguagePlaceholder } from './modules/copilot-natural-lang/NaturalLanguagePlaceholder';
 import { SubtitlesPanel } from './modules/copilot-subtitles/SubtitlesPanel';
-import { FilesystemMapPlaceholder } from './modules/context-map/FilesystemMapPlaceholder';
-import { HistoryDiaryPlaceholder } from './modules/history-diary/HistoryDiaryPlaceholder';
-import { TerminalPane } from './modules/terminal/TerminalPane';
+import { FilesystemMap } from './modules/context-map/FilesystemMap';
+import { HistoryDiary } from './modules/history-diary/HistoryDiary';
+import { TerminalPane, type TerminalPaneHandle } from './modules/terminal/TerminalPane';
 
 export function App() {
   const [analysis, setAnalysis] = useState<CommandAnalysis | null>(null);
   const [lastFailure, setLastFailure] = useState<CommandFailedEvent | null>(null);
+  const terminalRef = useRef<TerminalPaneHandle>(null);
 
   useEffect(() => {
     return window.shellmate.shell.onCommandFailed(setLastFailure);
+  }, []);
+
+  const runCommand = useCallback((command: string) => {
+    void terminalRef.current?.insertText(command);
   }, []);
 
   return (
     <ThreeColumnLayout
       contextColumn={
         <>
-          <FilesystemMapPlaceholder />
-          <HistoryDiaryPlaceholder />
+          <FilesystemMap />
+          <HistoryDiary onRunCommand={runCommand} />
         </>
       }
-      terminalColumn={<TerminalPane onAnalysisChange={setAnalysis} />}
+      terminalColumn={<TerminalPane ref={terminalRef} onAnalysisChange={setAnalysis} />}
       copilotColumn={
         <>
           <SubtitlesPanel analysis={analysis} />
