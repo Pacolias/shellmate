@@ -1,3 +1,11 @@
+// Must run before anything else — populates process.env.GEMINI_API_KEY /
+// ANTHROPIC_API_KEY / AI_PROVIDER from a .env file at the project root
+// (dotenv defaults to reading it from process.cwd(), which `npm run dev`/
+// `npm start` already set there) before ai-service.ts ever checks them.
+// A missing .env is a silent no-op, not an error — the app works the same
+// either way, see ai-service.ts's no-api-key path.
+import 'dotenv/config';
+
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow, shell } from 'electron';

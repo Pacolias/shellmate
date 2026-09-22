@@ -91,16 +91,14 @@ npm install
 npm run dev
 ```
 
-To try the natural-language copilot, set a key before launching (either works — Gemini is the default provider):
+To try the natural-language copilot, add a key — either works, Gemini is the default provider:
 
 ```bash
-export GEMINI_API_KEY="your-key-here"
-# or:
-export AI_PROVIDER="anthropic"
-export ANTHROPIC_API_KEY="your-key-here"
+cp .env.example .env
+# then edit .env and fill in GEMINI_API_KEY (or ANTHROPIC_API_KEY + AI_PROVIDER=anthropic)
 ```
 
-Without a key, the app runs exactly the same — that one panel just shows setup instructions instead of failing.
+`.env` is loaded automatically on launch and is gitignored, so the key never gets committed. `export`-ing the variable in your shell before `npm run dev` works too, it just won't persist across terminals. Without either, the app runs exactly the same — that one panel just shows setup instructions instead of failing.
 
 Other useful commands:
 
