@@ -1,4 +1,6 @@
 import type { CommandAnalysis } from './types/command';
+import type { ListDirectoryResult } from './types/filesystem';
+import type { HistoryEntry } from './types/history';
 import type { CommandFailedEvent, PtyExitEvent, PtyStartRequest } from './ipc-contract';
 import type { ShellEvent } from './types/shell-events';
 
@@ -21,6 +23,14 @@ export interface ShellmateBridge {
   };
   command: {
     analyze(input: string): Promise<CommandAnalysis>;
+  };
+  filesystem: {
+    listDirectory(path: string): Promise<ListDirectoryResult>;
+  };
+  history: {
+    list(): Promise<HistoryEntry[]>;
+    saveRecipe(id: string, name: string): Promise<HistoryEntry | null>;
+    onChanged(listener: (entry: HistoryEntry) => void): () => void;
   };
 }
 

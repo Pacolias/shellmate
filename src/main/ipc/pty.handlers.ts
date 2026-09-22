@@ -1,6 +1,10 @@
 import { ipcMain, type IpcMainInvokeEvent, type WebContents } from 'electron';
 import { IpcChannel, type PtyResizeMessage, type PtyStartRequest, type PtyWriteMessage } from '@shared/ipc-contract';
+import { parseCommand } from '../command-analysis/bash-parser';
+import { annotateCommand } from '../command-analysis/command-dictionary';
 import { lookupError } from '../command-analysis/error-catalog';
+import { deriveHistoryLabel } from '../command-analysis/history-label';
+import type { HistoryStore } from '../history/history.store';
 import { PtySession } from '../pty/pty-session';
 import { OscStreamParser } from '../shell-events/osc-parser';
 import { RecentOutputTracker } from '../shell-events/recent-output-tracker';
@@ -11,15 +15,20 @@ import { RecentOutputTracker } from '../shell-events/recent-output-tracker';
  * output is always routed through OscStreamParser first, so the renderer
  * never sees our own OSC 133/7 sequences mixed into the terminal stream.
  *
- * Also owns the "translated errors" flow end to end: it tracks the last
- * command (from OSC 133;C) and the output produced since it started, and
- * on a non-zero exit pushes a CommandFailed event with whatever
- * error-catalog.ts matched — the renderer never has to ask.
+ * Also owns two flows end to end, pushing to the renderer rather than
+ * waiting for it to ask:
+ * - Translated errors: tracks the output produced since the command
+ *   started, and on a non-zero exit pushes a CommandFailed event with
+ *   whatever error-catalog.ts matched.
+ * - History diary: on every finished command, records an entry (command,
+ *   cwd, a dictionary-derived label, exit code, duration) and pushes it.
  */
-export function registerPtyHandlers(getWebContents: () => WebContents | null): void {
+export function registerPtyHandlers(getWebContents: () => WebContents | null, historyStore: HistoryStore): void {
   const session = new PtySession();
   const outputTracker = new RecentOutputTracker();
-  let lastCommand: string | null = null;
+  let lastCommandRaw: string | null = null;
+  let lastCwd: string | null = null;
+  let commandStartedAt: number | null = null;
 
   const oscParser = new OscStreamParser({
     onData: (chunk) => {
@@ -27,19 +36,30 @@ export function registerPtyHandlers(getWebContents: () => WebContents | null): v
       getWebContents()?.send(IpcChannel.PtyData, chunk);
     },
     onShellEvent: (event) => {
+      if (event.type === 'cwd-changed') {
+        lastCwd = event.cwd;
+      }
+
       if (event.type === 'command-started') {
-        lastCommand = extractCommandName(event.command);
+        lastCommandRaw = event.command;
+        commandStartedAt = Date.now();
         outputTracker.reset();
       }
 
-      if (event.type === 'command-finished' && event.exitCode !== 0) {
-        const rawOutput = outputTracker.snapshot();
-        getWebContents()?.send(IpcChannel.CommandFailed, {
-          command: lastCommand,
-          exitCode: event.exitCode,
-          rawOutput,
-          match: lookupError(rawOutput, lastCommand),
-        });
+      if (event.type === 'command-finished') {
+        const commandName = lastCommandRaw ? extractCommandName(lastCommandRaw) : null;
+
+        if (event.exitCode !== 0) {
+          const rawOutput = outputTracker.snapshot();
+          getWebContents()?.send(IpcChannel.CommandFailed, {
+            command: commandName,
+            exitCode: event.exitCode,
+            rawOutput,
+            match: lookupError(rawOutput, commandName),
+          });
+        }
+
+        void recordHistoryEntry(historyStore, getWebContents, lastCommandRaw, lastCwd, event.exitCode, commandStartedAt);
       }
 
       getWebContents()?.send(IpcChannel.ShellEvent, event);
@@ -68,4 +88,30 @@ function extractCommandName(raw: string): string | null {
   if (tokens.length === 0) return null;
   if (tokens[0] === 'sudo' && tokens.length > 1) return tokens[1] ?? null;
   return tokens[0] ?? null;
+}
+
+async function recordHistoryEntry(
+  historyStore: HistoryStore,
+  getWebContents: () => WebContents | null,
+  command: string | null,
+  cwd: string | null,
+  exitCode: number,
+  startedAt: number | null,
+): Promise<void> {
+  const trimmed = command?.trim();
+  if (!trimmed) return; // A blank Enter has nothing worth recording.
+
+  const parsed = await parseCommand(trimmed);
+  const label = deriveHistoryLabel(annotateCommand(parsed));
+
+  const entry = await historyStore.add({
+    command: trimmed,
+    cwd,
+    label,
+    exitCode,
+    startedAt: startedAt ?? Date.now(),
+    durationMs: startedAt ? Date.now() - startedAt : 0,
+  });
+
+  getWebContents()?.send(IpcChannel.HistoryChanged, entry);
 }

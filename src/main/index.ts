@@ -3,14 +3,17 @@ import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow, shell } from 'electron';
 import { electronApp, is, optimizer } from '@electron-toolkit/utils';
 import { registerCommandHandlers } from './ipc/command.handlers';
+import { registerFilesystemHandlers } from './ipc/filesystem.handlers';
+import { registerHistoryHandlers } from './ipc/history.handlers';
 import { registerPtyHandlers } from './ipc/pty.handlers';
+import { HistoryStore } from './history/history.store';
 
 // Package.json declares "type": "module", so electron-vite builds main and
 // preload as real ESM (out/main/index.mjs, out/preload/index.mjs) — no
 // __dirname global, hence the fileURLToPath dance every Node ESM file needs.
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 
-function createWindow(): void {
+function createWindow(historyStore: HistoryStore): void {
   const mainWindow = new BrowserWindow({
     width: 1280,
     height: 800,
@@ -37,7 +40,9 @@ function createWindow(): void {
     return { action: 'deny' };
   });
 
-  registerPtyHandlers(() => mainWindow.webContents);
+  const getWebContents = (): Electron.WebContents | null => mainWindow.webContents;
+  registerPtyHandlers(getWebContents, historyStore);
+  registerHistoryHandlers(historyStore, getWebContents);
 
   if (is.dev && process.env.ELECTRON_RENDERER_URL) {
     mainWindow.loadURL(process.env.ELECTRON_RENDERER_URL);
@@ -54,8 +59,11 @@ app.whenReady().then(() => {
   });
 
   registerCommandHandlers();
+  registerFilesystemHandlers();
 
-  createWindow();
+  const historyStore = new HistoryStore(path.join(app.getPath('userData'), 'history.json'));
+
+  createWindow(historyStore);
 });
 
 app.on('window-all-closed', () => {

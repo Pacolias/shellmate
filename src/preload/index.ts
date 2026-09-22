@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
 import type { ShellmateBridge } from '@shared/bridge-api';
 import { IpcChannel, type CommandFailedEvent, type PtyExitEvent } from '@shared/ipc-contract';
+import type { HistoryEntry } from '@shared/types/history';
 import type { ShellEvent } from '@shared/types/shell-events';
 
 function onIpc<TPayload>(channel: string, listener: (payload: TPayload) => void): () => void {
@@ -28,6 +29,14 @@ const bridge: ShellmateBridge = {
   },
   command: {
     analyze: (input) => ipcRenderer.invoke(IpcChannel.CommandAnalyze, { input }),
+  },
+  filesystem: {
+    listDirectory: (path) => ipcRenderer.invoke(IpcChannel.FilesystemListDirectory, { path }),
+  },
+  history: {
+    list: () => ipcRenderer.invoke(IpcChannel.HistoryList),
+    saveRecipe: (id, name) => ipcRenderer.invoke(IpcChannel.HistorySaveRecipe, { id, name }),
+    onChanged: (listener) => onIpc<HistoryEntry>(IpcChannel.HistoryChanged, listener),
   },
 };
 

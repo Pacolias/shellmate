@@ -1,5 +1,7 @@
 import type { CommandAnalysis } from './types/command';
 import type { ErrorMatch } from './types/errors';
+import type { ListDirectoryResult } from './types/filesystem';
+import type { HistoryEntry } from './types/history';
 import type { ShellEvent } from './types/shell-events';
 
 /**
@@ -15,6 +17,10 @@ export const IpcChannel = {
   ShellEvent: 'shell:event',
   CommandFailed: 'command:failed',
   CommandAnalyze: 'command:analyze',
+  FilesystemListDirectory: 'filesystem:list-directory',
+  HistoryList: 'history:list',
+  HistorySaveRecipe: 'history:save-recipe',
+  HistoryChanged: 'history:changed',
 } as const;
 
 export interface PtyStartRequest {
@@ -54,10 +60,22 @@ export interface CommandFailedEvent {
   match: ErrorMatch | null;
 }
 
+export interface ListDirectoryRequest {
+  path: string;
+}
+
+export interface SaveRecipeRequest {
+  id: string;
+  name: string;
+}
+
 /** Renderer → main, request/response (`ipcRenderer.invoke` / `ipcMain.handle`). */
 export interface IpcInvokeMap {
   [IpcChannel.PtyStart]: { request: PtyStartRequest; response: void };
   [IpcChannel.CommandAnalyze]: { request: CommandAnalyzeRequest; response: CommandAnalysis };
+  [IpcChannel.FilesystemListDirectory]: { request: ListDirectoryRequest; response: ListDirectoryResult };
+  [IpcChannel.HistoryList]: { request: void; response: HistoryEntry[] };
+  [IpcChannel.HistorySaveRecipe]: { request: SaveRecipeRequest; response: HistoryEntry | null };
 }
 
 /** Renderer → main, fire-and-forget (`ipcRenderer.send` / `ipcMain.on`). */
@@ -72,6 +90,8 @@ export interface IpcEventMap {
   [IpcChannel.PtyExit]: PtyExitEvent;
   [IpcChannel.ShellEvent]: ShellEvent;
   [IpcChannel.CommandFailed]: CommandFailedEvent;
+  /** A history entry was added or updated (e.g. named as a recipe) — the renderer upserts it by id. */
+  [IpcChannel.HistoryChanged]: HistoryEntry;
 }
 
 export type IpcInvokeChannel = keyof IpcInvokeMap;
