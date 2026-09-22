@@ -13,8 +13,8 @@ export const IpcChannel = {
   PtyData: 'pty:data',
   PtyExit: 'pty:exit',
   ShellEvent: 'shell:event',
+  CommandFailed: 'command:failed',
   CommandAnalyze: 'command:analyze',
-  ErrorLookup: 'error:lookup',
 } as const;
 
 export interface PtyStartRequest {
@@ -39,17 +39,25 @@ export interface CommandAnalyzeRequest {
   input: string;
 }
 
-export interface ErrorLookupRequest {
-  /** The command that failed, if known — narrows which catalog entries apply. */
+/**
+ * Pushed by main whenever a command finishes with a non-zero exit code —
+ * main already tracks the command text (from OSC 133;C) and the terminal
+ * output since it started, so it looks the error up itself instead of
+ * waiting for the renderer to ask. `match` is null when nothing in the
+ * catalog matched `rawOutput`; the UI shows the raw output as a fallback
+ * rather than inventing an explanation.
+ */
+export interface CommandFailedEvent {
   command: string | null;
-  stderr: string;
+  exitCode: number;
+  rawOutput: string;
+  match: ErrorMatch | null;
 }
 
 /** Renderer → main, request/response (`ipcRenderer.invoke` / `ipcMain.handle`). */
 export interface IpcInvokeMap {
   [IpcChannel.PtyStart]: { request: PtyStartRequest; response: void };
   [IpcChannel.CommandAnalyze]: { request: CommandAnalyzeRequest; response: CommandAnalysis };
-  [IpcChannel.ErrorLookup]: { request: ErrorLookupRequest; response: ErrorMatch | null };
 }
 
 /** Renderer → main, fire-and-forget (`ipcRenderer.send` / `ipcMain.on`). */
@@ -63,6 +71,7 @@ export interface IpcEventMap {
   [IpcChannel.PtyData]: string;
   [IpcChannel.PtyExit]: PtyExitEvent;
   [IpcChannel.ShellEvent]: ShellEvent;
+  [IpcChannel.CommandFailed]: CommandFailedEvent;
 }
 
 export type IpcInvokeChannel = keyof IpcInvokeMap;

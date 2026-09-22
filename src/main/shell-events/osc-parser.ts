@@ -113,7 +113,8 @@ function parsePromptEvent(payload: string): ShellEvent | null {
     case 'A':
       return { type: 'prompt-started' };
     case 'C':
-      return { type: 'command-started' };
+      // Payload looks like "C;<base64-encoded command text>".
+      return { type: 'command-started', command: safeDecodeBase64(payload.slice(2)) };
     case 'D': {
       // Payload looks like "D;<exit_code>".
       const exitCode = Number.parseInt(payload.slice(2), 10);
@@ -138,5 +139,13 @@ function safeDecodeUriComponent(value: string): string {
     return decodeURIComponent(value);
   } catch {
     return value;
+  }
+}
+
+function safeDecodeBase64(value: string): string {
+  try {
+    return Buffer.from(value, 'base64').toString('utf8');
+  } catch {
+    return '';
   }
 }

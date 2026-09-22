@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { OscStreamParser } from '../../src/main/shell-events/osc-parser';
 import type { ShellEvent } from '../../shared/types/shell-events';
 
+function b64(text: string): string {
+  return Buffer.from(text, 'utf8').toString('base64');
+}
+
 function run(chunks: string[]) {
   const data: string[] = [];
   const events: ShellEvent[] = [];
@@ -26,9 +30,14 @@ describe('OscStreamParser', () => {
     expect(events).toEqual([{ type: 'prompt-started' }]);
   });
 
-  it('extracts command-started from OSC 133;C', () => {
-    const { events } = run(['\x1b]133;C\x07']);
-    expect(events).toEqual([{ type: 'command-started' }]);
+  it('extracts command-started with the base64-decoded command text from OSC 133;C', () => {
+    const { events } = run([`\x1b]133;C;${b64('rm -rf /tmp/x')}\x07`]);
+    expect(events).toEqual([{ type: 'command-started', command: 'rm -rf /tmp/x' }]);
+  });
+
+  it('never throws on a malformed base64 payload, even if the decoded text is garbage', () => {
+    const { events } = run(['\x1b]133;C;not-valid-base64!!!\x07']);
+    expect(events).toEqual([{ type: 'command-started', command: expect.any(String) }]);
   });
 
   it('extracts command-finished with exit code from OSC 133;D;<code>', () => {
@@ -73,14 +82,14 @@ describe('OscStreamParser', () => {
       'before ',
       '\x1b]133;A\x07',
       'prompt$ ',
-      '\x1b]133;C\x07',
+      `\x1b]133;C;${b64('echo hi')}\x07`,
       'output\r\n',
       '\x1b]133;D;0\x07',
     ]);
     expect(data).toBe('before prompt$ output\r\n');
     expect(events).toEqual([
       { type: 'prompt-started' },
-      { type: 'command-started' },
+      { type: 'command-started', command: 'echo hi' },
       { type: 'command-finished', exitCode: 0 },
     ]);
   });

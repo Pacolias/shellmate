@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
 import type { ShellmateBridge } from '@shared/bridge-api';
-import { IpcChannel, type PtyExitEvent } from '@shared/ipc-contract';
+import { IpcChannel, type CommandFailedEvent, type PtyExitEvent } from '@shared/ipc-contract';
 import type { ShellEvent } from '@shared/types/shell-events';
 
 function onIpc<TPayload>(channel: string, listener: (payload: TPayload) => void): () => void {
@@ -24,12 +24,10 @@ const bridge: ShellmateBridge = {
   },
   shell: {
     onEvent: (listener) => onIpc<ShellEvent>(IpcChannel.ShellEvent, listener),
+    onCommandFailed: (listener) => onIpc<CommandFailedEvent>(IpcChannel.CommandFailed, listener),
   },
   command: {
     analyze: (input) => ipcRenderer.invoke(IpcChannel.CommandAnalyze, { input }),
-  },
-  errors: {
-    lookup: (command, stderr) => ipcRenderer.invoke(IpcChannel.ErrorLookup, { command, stderr }),
   },
 };
 

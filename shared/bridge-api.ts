@@ -1,6 +1,5 @@
 import type { CommandAnalysis } from './types/command';
-import type { ErrorMatch } from './types/errors';
-import type { PtyExitEvent, PtyStartRequest } from './ipc-contract';
+import type { CommandFailedEvent, PtyExitEvent, PtyStartRequest } from './ipc-contract';
 import type { ShellEvent } from './types/shell-events';
 
 /**
@@ -18,12 +17,10 @@ export interface ShellmateBridge {
   };
   shell: {
     onEvent(listener: (event: ShellEvent) => void): () => void;
+    onCommandFailed(listener: (event: CommandFailedEvent) => void): () => void;
   };
   command: {
     analyze(input: string): Promise<CommandAnalysis>;
-  };
-  errors: {
-    lookup(command: string | null, stderr: string): Promise<ErrorMatch | null>;
   };
 }
 

@@ -11,11 +11,15 @@ __shellmate_osc7() {
 
 # Runs once per prompt cycle, right before the command the user typed starts
 # executing. Guarded by a flag so it doesn't also fire for commands that are
-# part of PROMPT_COMMAND itself.
+# part of PROMPT_COMMAND itself. The command text is base64-encoded so
+# arbitrary quoting/newlines in $BASH_COMMAND can never corrupt the OSC
+# payload — the app decodes it on the other end.
 __shellmate_preexec() {
   if [[ "${__shellmate_preexec_done:-0}" == "0" && "$BASH_COMMAND" != "$PROMPT_COMMAND" ]]; then
     __shellmate_preexec_done=1
-    printf '\e]133;C\a'
+    local encoded
+    encoded=$(printf '%s' "$BASH_COMMAND" | base64 | tr -d '\n')
+    printf '\e]133;C;%s\a' "$encoded"
   fi
 }
 

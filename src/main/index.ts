@@ -3,7 +3,6 @@ import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow, shell } from 'electron';
 import { electronApp, is, optimizer } from '@electron-toolkit/utils';
 import { registerCommandHandlers } from './ipc/command.handlers';
-import { registerErrorHandlers } from './ipc/error.handlers';
 import { registerPtyHandlers } from './ipc/pty.handlers';
 
 // Package.json declares "type": "module", so electron-vite builds main and
@@ -55,7 +54,6 @@ app.whenReady().then(() => {
   });
 
   registerCommandHandlers();
-  registerErrorHandlers();
 
   createWindow();
 });

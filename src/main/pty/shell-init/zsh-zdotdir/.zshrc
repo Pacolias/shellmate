@@ -16,8 +16,13 @@ __shellmate_precmd() {
   printf '\e]133;A\a'
 }
 
+# zsh's preexec hook receives the about-to-run command line as $1.
+# Base64-encoded for the same reason as bash's version: arbitrary quoting
+# must never corrupt the OSC payload.
 __shellmate_preexec() {
-  printf '\e]133;C\a'
+  local encoded
+  encoded=$(printf '%s' "$1" | base64 | tr -d '\n')
+  printf '\e]133;C;%s\a' "$encoded"
 }
 
 autoload -Uz add-zsh-hook
