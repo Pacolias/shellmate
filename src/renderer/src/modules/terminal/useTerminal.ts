@@ -65,6 +65,21 @@ export function useTerminal(
       cursorBlink: true,
       fontFamily: 'var(--font-mono)',
       fontSize: 14,
+      // xterm.js's default (1) sizes each row's cell height to
+      // floor(measuredCharHeight * lineHeight), which clips descenders
+      // (the tail on p/g/j/q/y) once a font's glyphs extend past that box
+      // — happens on any system without our preferred monospace fonts
+      // installed, falling back to whatever the OS resolves `monospace`
+      // to (confirmed on Linux/Fontconfig: falls back to Noto Sans Mono,
+      // whose descenders need real headroom). 1.6 looked sufficient when
+      // only tested against plain-weight text (e.g. echoed output), but
+      // still clipped the "g" in *bold* text — real shells commonly bold
+      // syntax-highlighted input (e.g. zsh-syntax-highlighting coloring a
+      // recognized command as you type it), and a bold glyph's descender
+      // sits lower than the same glyph at regular weight. 1.7 is the
+      // smallest value that keeps both weights uncapped, confirmed against
+      // a real bold "git" render, not just plain echoed text.
+      lineHeight: 1.7,
       theme: resolveXtermTheme(),
     });
     terminalRef.current = terminal;
