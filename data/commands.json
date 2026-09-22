@@ -1,0 +1,413 @@
+{
+  "ls": {
+    "summary": "Lista los archivos y carpetas de un directorio.",
+    "baseDanger": "safe",
+    "flags": {
+      "-l": "Muestra los detalles en formato de lista (permisos, dueño, tamaño, fecha).",
+      "-a": "Incluye los archivos ocultos (los que empiezan por un punto).",
+      "-h": "Muestra los tamaños en formato legible (KB, MB, GB) en vez de bytes.",
+      "-la": "Combina -l y -a: lista detallada incluyendo ocultos.",
+      "-R": "Lista también el contenido de las subcarpetas, de forma recursiva."
+    },
+    "examples": ["ls", "ls -la", "ls -lh /home"]
+  },
+  "cd": {
+    "summary": "Cambia el directorio de trabajo actual.",
+    "baseDanger": "safe",
+    "flags": {},
+    "examples": ["cd Documentos", "cd ..", "cd ~", "cd -"]
+  },
+  "pwd": {
+    "summary": "Muestra la ruta completa del directorio en el que estás.",
+    "baseDanger": "safe",
+    "flags": {},
+    "examples": ["pwd"]
+  },
+  "cp": {
+    "summary": "Copia archivos o carpetas de un sitio a otro.",
+    "baseDanger": "caution",
+    "flags": {
+      "-r": "Copia carpetas enteras, incluyendo su contenido.",
+      "-v": "Muestra qué archivos se van copiando.",
+      "-i": "Pregunta antes de sobrescribir un archivo existente.",
+      "-n": "Nunca sobrescribe un archivo si ya existe en el destino."
+    },
+    "examples": ["cp informe.txt copia.txt", "cp -r carpeta/ respaldo/"]
+  },
+  "mv": {
+    "summary": "Mueve o renombra archivos o carpetas.",
+    "baseDanger": "caution",
+    "flags": {
+      "-i": "Pregunta antes de sobrescribir un archivo existente.",
+      "-v": "Muestra qué archivos se van moviendo.",
+      "-n": "Nunca sobrescribe un archivo si ya existe en el destino."
+    },
+    "examples": ["mv borrador.txt final.txt", "mv *.jpg fotos/"]
+  },
+  "rm": {
+    "summary": "Elimina archivos. Por defecto, no se pueden recuperar desde la terminal.",
+    "baseDanger": "caution",
+    "flags": {
+      "-r": "Elimina también carpetas y todo su contenido, de forma recursiva.",
+      "-f": "Fuerza el borrado sin pedir confirmación, incluso de archivos protegidos.",
+      "-rf": "La combinación más peligrosa: borra carpetas enteras sin preguntar nada.",
+      "-i": "Pregunta antes de borrar cada archivo."
+    },
+    "examples": ["rm archivo.txt", "rm -i archivo.txt"]
+  },
+  "rmdir": {
+    "summary": "Elimina una carpeta, solo si está vacía.",
+    "baseDanger": "safe",
+    "flags": {
+      "-p": "Elimina también las carpetas superiores si se quedan vacías."
+    },
+    "examples": ["rmdir carpeta_vacia"]
+  },
+  "mkdir": {
+    "summary": "Crea una nueva carpeta.",
+    "baseDanger": "safe",
+    "flags": {
+      "-p": "Crea también las carpetas intermedias que hagan falta, sin dar error si ya existen."
+    },
+    "examples": ["mkdir proyectos", "mkdir -p proyectos/2026/enero"]
+  },
+  "touch": {
+    "summary": "Crea un archivo vacío, o actualiza su fecha de modificación si ya existe.",
+    "baseDanger": "safe",
+    "flags": {},
+    "examples": ["touch nota.txt"]
+  },
+  "cat": {
+    "summary": "Muestra el contenido completo de un archivo de texto.",
+    "baseDanger": "safe",
+    "flags": {
+      "-n": "Numera cada línea del archivo."
+    },
+    "examples": ["cat README.md", "cat archivo1.txt archivo2.txt"]
+  },
+  "less": {
+    "summary": "Abre un archivo para leerlo página a página, sin cargarlo entero en la terminal.",
+    "baseDanger": "safe",
+    "flags": {
+      "-N": "Muestra el número de línea a la izquierda."
+    },
+    "examples": ["less registro.log"]
+  },
+  "more": {
+    "summary": "Muestra un archivo página a página (versión más simple de less).",
+    "baseDanger": "safe",
+    "flags": {},
+    "examples": ["more registro.log"]
+  },
+  "head": {
+    "summary": "Muestra las primeras líneas de un archivo.",
+    "baseDanger": "safe",
+    "flags": {
+      "-n": "Elige cuántas líneas mostrar (por ejemplo, -n 20)."
+    },
+    "examples": ["head archivo.txt", "head -n 5 archivo.txt"]
+  },
+  "tail": {
+    "summary": "Muestra las últimas líneas de un archivo.",
+    "baseDanger": "safe",
+    "flags": {
+      "-n": "Elige cuántas líneas mostrar (por ejemplo, -n 20).",
+      "-f": "Sigue el archivo en vivo, mostrando líneas nuevas a medida que se añaden."
+    },
+    "examples": ["tail archivo.log", "tail -f servidor.log"]
+  },
+  "grep": {
+    "summary": "Busca un texto dentro de uno o varios archivos.",
+    "baseDanger": "safe",
+    "flags": {
+      "-r": "Busca también dentro de las subcarpetas, de forma recursiva.",
+      "-i": "Ignora si el texto está en mayúsculas o minúsculas.",
+      "-n": "Muestra el número de línea donde aparece cada coincidencia.",
+      "-v": "Muestra las líneas que NO contienen el texto buscado."
+    },
+    "examples": ["grep \"error\" registro.log", "grep -ri \"todo\" src/"]
+  },
+  "find": {
+    "summary": "Busca archivos y carpetas según nombre, tipo, tamaño u otros criterios.",
+    "baseDanger": "safe",
+    "flags": {
+      "-name": "Busca por nombre de archivo, admite comodines como *.txt.",
+      "-type": "Filtra por tipo: f para archivos, d para carpetas.",
+      "-exec": "Ejecuta otro comando sobre cada resultado encontrado — puede volverse peligroso si ese comando es destructivo."
+    },
+    "examples": ["find . -name \"*.log\"", "find /tmp -type d"]
+  },
+  "locate": {
+    "summary": "Busca archivos por nombre usando un índice ya construido (más rápido que find, pero puede no estar actualizado).",
+    "baseDanger": "safe",
+    "flags": {},
+    "examples": ["locate archivo.txt"]
+  },
+  "chmod": {
+    "summary": "Cambia los permisos de un archivo o carpeta (quién puede leer, escribir o ejecutar).",
+    "baseDanger": "caution",
+    "flags": {
+      "-R": "Aplica el cambio también a todo el contenido de una carpeta, de forma recursiva.",
+      "+x": "Añade permiso de ejecución.",
+      "777": "Da permiso total de lectura, escritura y ejecución a cualquier usuario del sistema — casi nunca es buena idea."
+    },
+    "examples": ["chmod +x script.sh", "chmod 644 archivo.txt"]
+  },
+  "chown": {
+    "summary": "Cambia el dueño (y opcionalmente el grupo) de un archivo o carpeta.",
+    "baseDanger": "caution",
+    "flags": {
+      "-R": "Aplica el cambio también a todo el contenido de una carpeta, de forma recursiva."
+    },
+    "examples": ["chown usuario archivo.txt", "chown -R usuario:grupo carpeta/"]
+  },
+  "sudo": {
+    "summary": "Ejecuta el siguiente comando con permisos de administrador. Cualquier riesgo del comando que sigue se multiplica.",
+    "baseDanger": "caution",
+    "flags": {},
+    "examples": ["sudo apt update", "sudo systemctl restart nginx"]
+  },
+  "apt": {
+    "summary": "Instala, actualiza o elimina programas del sistema (Debian/Ubuntu).",
+    "baseDanger": "caution",
+    "flags": {
+      "install": "Instala uno o varios paquetes.",
+      "remove": "Desinstala un paquete, pero conserva su configuración.",
+      "purge": "Desinstala un paquete y también borra su configuración.",
+      "update": "Actualiza la lista de paquetes disponibles (no instala nada todavía).",
+      "upgrade": "Instala las versiones más recientes de los paquetes ya instalados."
+    },
+    "examples": ["sudo apt update", "sudo apt install git", "sudo apt remove paquete"]
+  },
+  "apt-get": {
+    "summary": "Versión clásica de apt para instalar, actualizar o eliminar programas.",
+    "baseDanger": "caution",
+    "flags": {
+      "install": "Instala uno o varios paquetes.",
+      "remove": "Desinstala un paquete."
+    },
+    "examples": ["sudo apt-get update", "sudo apt-get install curl"]
+  },
+  "dpkg": {
+    "summary": "Instala o gestiona paquetes .deb directamente, sin resolver dependencias por ti.",
+    "baseDanger": "caution",
+    "flags": {
+      "-i": "Instala un archivo .deb.",
+      "-r": "Elimina un paquete instalado."
+    },
+    "examples": ["sudo dpkg -i paquete.deb"]
+  },
+  "tar": {
+    "summary": "Empaqueta o desempaqueta archivos en formato .tar (opcionalmente comprimido).",
+    "baseDanger": "safe",
+    "flags": {
+      "-c": "Crea un nuevo archivo .tar.",
+      "-x": "Extrae el contenido de un archivo .tar.",
+      "-v": "Muestra qué archivos se van procesando.",
+      "-f": "Indica el nombre del archivo .tar a usar.",
+      "-z": "Comprime o descomprime usando gzip (.tar.gz)."
+    },
+    "examples": ["tar -czvf backup.tar.gz carpeta/", "tar -xzvf backup.tar.gz"]
+  },
+  "zip": {
+    "summary": "Comprime archivos o carpetas en formato .zip.",
+    "baseDanger": "safe",
+    "flags": {
+      "-r": "Incluye también el contenido de las subcarpetas."
+    },
+    "examples": ["zip -r archivo.zip carpeta/"]
+  },
+  "unzip": {
+    "summary": "Extrae el contenido de un archivo .zip.",
+    "baseDanger": "safe",
+    "flags": {
+      "-l": "Lista el contenido del .zip sin extraerlo."
+    },
+    "examples": ["unzip archivo.zip"]
+  },
+  "curl": {
+    "summary": "Descarga o envía datos a una URL desde la terminal.",
+    "baseDanger": "caution",
+    "flags": {
+      "-o": "Guarda la respuesta en un archivo en vez de mostrarla en pantalla.",
+      "-L": "Sigue redirecciones si la URL apunta a otra dirección.",
+      "-s": "Modo silencioso: no muestra la barra de progreso."
+    },
+    "examples": ["curl https://ejemplo.com", "curl -o archivo.zip https://ejemplo.com/archivo.zip"]
+  },
+  "wget": {
+    "summary": "Descarga archivos desde una URL y los guarda en el disco.",
+    "baseDanger": "caution",
+    "flags": {
+      "-O": "Elige el nombre con el que se guarda el archivo descargado."
+    },
+    "examples": ["wget https://ejemplo.com/archivo.zip"]
+  },
+  "ps": {
+    "summary": "Muestra los procesos que se están ejecutando en el sistema.",
+    "baseDanger": "safe",
+    "flags": {
+      "aux": "Muestra todos los procesos de todos los usuarios, con detalles de uso de CPU y memoria."
+    },
+    "examples": ["ps", "ps aux"]
+  },
+  "top": {
+    "summary": "Muestra los procesos activos en tiempo real, ordenados por uso de recursos.",
+    "baseDanger": "safe",
+    "flags": {},
+    "examples": ["top"]
+  },
+  "htop": {
+    "summary": "Versión más visual e interactiva de top para ver procesos en tiempo real.",
+    "baseDanger": "safe",
+    "flags": {},
+    "examples": ["htop"]
+  },
+  "kill": {
+    "summary": "Envía una señal a un proceso, normalmente para pedirle que termine.",
+    "baseDanger": "caution",
+    "flags": {
+      "-9": "Fuerza el cierre inmediato del proceso, sin darle opción a guardar nada."
+    },
+    "examples": ["kill 1234", "kill -9 1234"]
+  },
+  "killall": {
+    "summary": "Termina todos los procesos que coincidan con un nombre.",
+    "baseDanger": "caution",
+    "flags": {
+      "-9": "Fuerza el cierre inmediato de todos los procesos encontrados."
+    },
+    "examples": ["killall firefox"]
+  },
+  "df": {
+    "summary": "Muestra el espacio usado y disponible en los discos montados.",
+    "baseDanger": "safe",
+    "flags": {
+      "-h": "Muestra los tamaños en formato legible (KB, MB, GB)."
+    },
+    "examples": ["df -h"]
+  },
+  "du": {
+    "summary": "Muestra cuánto espacio ocupan archivos o carpetas.",
+    "baseDanger": "safe",
+    "flags": {
+      "-h": "Muestra los tamaños en formato legible (KB, MB, GB).",
+      "-s": "Muestra solo el total de una carpeta, sin desglosar cada archivo."
+    },
+    "examples": ["du -sh carpeta/"]
+  },
+  "free": {
+    "summary": "Muestra la memoria RAM total, usada y disponible.",
+    "baseDanger": "safe",
+    "flags": {
+      "-h": "Muestra los tamaños en formato legible (KB, MB, GB)."
+    },
+    "examples": ["free -h"]
+  },
+  "whoami": {
+    "summary": "Muestra el nombre del usuario con el que has iniciado sesión.",
+    "baseDanger": "safe",
+    "flags": {},
+    "examples": ["whoami"]
+  },
+  "which": {
+    "summary": "Muestra la ruta completa de un comando, si está instalado.",
+    "baseDanger": "safe",
+    "flags": {},
+    "examples": ["which python3"]
+  },
+  "man": {
+    "summary": "Abre el manual de un comando con todas sus opciones explicadas.",
+    "baseDanger": "safe",
+    "flags": {},
+    "examples": ["man ls"]
+  },
+  "history": {
+    "summary": "Muestra los comandos que has ejecutado antes en esta sesión.",
+    "baseDanger": "safe",
+    "flags": {
+      "-c": "Borra todo el historial de comandos."
+    },
+    "examples": ["history"]
+  },
+  "echo": {
+    "summary": "Muestra un texto en pantalla, o lo guarda en un archivo si se combina con >.",
+    "baseDanger": "safe",
+    "flags": {},
+    "examples": ["echo \"Hola mundo\"", "echo \"contenido\" > archivo.txt"]
+  },
+  "export": {
+    "summary": "Crea o actualiza una variable de entorno para la sesión actual de la terminal.",
+    "baseDanger": "safe",
+    "flags": {},
+    "examples": ["export EDITOR=vim"]
+  },
+  "env": {
+    "summary": "Muestra todas las variables de entorno activas.",
+    "baseDanger": "safe",
+    "flags": {},
+    "examples": ["env"]
+  },
+  "ssh": {
+    "summary": "Abre una conexión remota segura a otro ordenador.",
+    "baseDanger": "caution",
+    "flags": {
+      "-p": "Indica el puerto al que conectarse, si no es el habitual (22)."
+    },
+    "examples": ["ssh usuario@servidor.com"]
+  },
+  "scp": {
+    "summary": "Copia archivos entre tu ordenador y otro remoto, usando una conexión segura.",
+    "baseDanger": "caution",
+    "flags": {
+      "-r": "Copia carpetas enteras, incluyendo su contenido."
+    },
+    "examples": ["scp archivo.txt usuario@servidor.com:/ruta/"]
+  },
+  "git": {
+    "summary": "Gestiona el historial de versiones de un proyecto de código.",
+    "baseDanger": "safe",
+    "flags": {
+      "status": "Muestra qué archivos han cambiado desde el último commit.",
+      "add": "Prepara cambios para incluirlos en el próximo commit.",
+      "commit": "Guarda los cambios preparados como un punto en el historial.",
+      "push": "Envía tus commits a un repositorio remoto.",
+      "pull": "Descarga y aplica los cambios de un repositorio remoto.",
+      "reset --hard": "Descarta cambios sin guardar y vuelve a un punto anterior del historial — no se puede deshacer."
+    },
+    "examples": ["git status", "git add .", "git commit -m \"mensaje\""]
+  },
+  "systemctl": {
+    "summary": "Arranca, para o consulta el estado de servicios del sistema.",
+    "baseDanger": "caution",
+    "flags": {
+      "start": "Arranca un servicio.",
+      "stop": "Detiene un servicio.",
+      "restart": "Reinicia un servicio.",
+      "status": "Muestra el estado actual de un servicio.",
+      "enable": "Hace que un servicio arranque automáticamente al encender el equipo."
+    },
+    "examples": ["systemctl status nginx", "sudo systemctl restart nginx"]
+  },
+  "journalctl": {
+    "summary": "Consulta los registros (logs) del sistema.",
+    "baseDanger": "safe",
+    "flags": {
+      "-f": "Sigue los registros en vivo, mostrando entradas nuevas a medida que aparecen.",
+      "-u": "Filtra los registros de un servicio concreto."
+    },
+    "examples": ["journalctl -f", "journalctl -u nginx"]
+  },
+  "clear": {
+    "summary": "Limpia la pantalla de la terminal. No afecta a nada más.",
+    "baseDanger": "safe",
+    "flags": {},
+    "examples": ["clear"]
+  },
+  "exit": {
+    "summary": "Cierra la sesión actual de la terminal.",
+    "baseDanger": "safe",
+    "flags": {},
+    "examples": ["exit"]
+  }
+}

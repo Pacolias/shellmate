@@ -1,0 +1,75 @@
+[
+  {
+    "id": "permission-denied",
+    "pattern": "[Pp]ermission denied",
+    "explanation": "No tienes permiso para acceder a este archivo o carpeta con tu usuario actual.",
+    "suggestion": "Revisa quién es el dueño con \"ls -l\", o vuelve a intentarlo con \"sudo\" si de verdad necesitas permisos de administrador."
+  },
+  {
+    "id": "command-not-found",
+    "pattern": "command not found|no se encontr[oó] la orden",
+    "explanation": "El programa que has escrito no existe o no está instalado en este sistema.",
+    "suggestion": "Comprueba que lo has escrito bien, o instálalo con el gestor de paquetes de tu sistema (por ejemplo, \"sudo apt install <programa>\")."
+  },
+  {
+    "id": "no-such-file-or-directory",
+    "pattern": "No such file or directory",
+    "explanation": "La ruta que has indicado no existe.",
+    "suggestion": "Revisa que el nombre esté bien escrito y que estés en la carpeta correcta — puedes comprobarlo con \"pwd\" y \"ls\"."
+  },
+  {
+    "id": "is-a-directory",
+    "pattern": "[Ii]s a directory",
+    "explanation": "Has intentado tratar una carpeta como si fuera un archivo (por ejemplo, leerla con \"cat\").",
+    "suggestion": "Si quieres ver su contenido, usa \"ls\" en vez de \"cat\". Si quieres copiarla o borrarla, añade la opción \"-r\"."
+  },
+  {
+    "id": "directory-not-empty",
+    "pattern": "Directory not empty",
+    "explanation": "La carpeta que intentas borrar todavía tiene archivos dentro.",
+    "suggestion": "\"rmdir\" solo borra carpetas vacías. Si quieres borrarla con todo su contenido, usa \"rm -r\" (con cuidado)."
+  },
+  {
+    "id": "file-exists",
+    "pattern": "File exists",
+    "explanation": "Ya existe un archivo o carpeta con ese mismo nombre.",
+    "suggestion": "Elige otro nombre, o borra/renombra primero el que ya existe."
+  },
+  {
+    "id": "not-a-git-repository",
+    "pattern": "not a git repository",
+    "explanation": "Esta carpeta no es (ni está dentro de) un repositorio de git.",
+    "suggestion": "Si querías crear uno nuevo, ejecuta \"git init\". Si esperabas que ya existiera, comprueba que estás en la carpeta correcta.",
+    "commands": ["git"]
+  },
+  {
+    "id": "address-already-in-use",
+    "pattern": "[Aa]ddress already in use",
+    "explanation": "Ese puerto ya lo está usando otro programa.",
+    "suggestion": "Cierra el programa que lo esté usando, o arranca el tuyo en otro puerto."
+  },
+  {
+    "id": "connection-refused",
+    "pattern": "Connection refused",
+    "explanation": "No se ha podido conectar porque nadie está escuchando en esa dirección o puerto.",
+    "suggestion": "Comprueba que el servicio al que intentas conectarte está encendido y que la dirección/puerto son correctos."
+  },
+  {
+    "id": "no-space-left",
+    "pattern": "No space left on device",
+    "explanation": "El disco se ha quedado sin espacio libre.",
+    "suggestion": "Libera espacio borrando archivos que no necesites, o revisa qué ocupa más con \"du -sh *\"."
+  },
+  {
+    "id": "too-many-open-files",
+    "pattern": "[Tt]oo many open files",
+    "explanation": "El sistema (o el programa) ha alcanzado el límite de archivos que puede tener abiertos a la vez.",
+    "suggestion": "Cierra procesos que ya no necesites, o reinicia el programa que está fallando."
+  },
+  {
+    "id": "syntax-error-near-token",
+    "pattern": "syntax error near unexpected token",
+    "explanation": "La terminal no ha entendido la estructura del comando (por ejemplo, faltan comillas o paréntesis).",
+    "suggestion": "Revisa que las comillas y paréntesis estén bien cerrados antes de volver a ejecutarlo."
+  }
+]

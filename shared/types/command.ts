@@ -15,6 +15,13 @@ export interface ParsedToken {
   /** Byte offsets into the segment's source command, for highlighting. */
   start: number;
   end: number;
+  /**
+   * Plain-language explanation from the command dictionary (e.g. what `-rf`
+   * does for `rm`). Absent when the token comes straight out of the parser;
+   * filled in by command-dictionary.ts before a CommandAnalysis is sent to
+   * the renderer. Null when the dictionary has no entry for it.
+   */
+  description?: string | null;
 }
 
 /** One command invocation (one pipeline stage, or one side of `&&`/`;`). */
@@ -22,6 +29,8 @@ export interface ParsedSegment {
   /** The command name (e.g. "rm"), or null if it couldn't be determined. */
   command: string | null;
   tokens: ParsedToken[];
+  /** One-line summary of what the command does, from the dictionary. */
+  commandSummary?: string | null;
 }
 
 /** Simplified AST for a full input line, possibly containing several commands. */
