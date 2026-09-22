@@ -1,0 +1,57 @@
+.badge {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.reason {
+  color: var(--color-text-secondary);
+  font-weight: 400;
+}
+
+.badge[data-level='safe'] {
+  background: var(--color-danger-safe-bg);
+}
+.badge[data-level='safe'] .dot {
+  background: var(--color-danger-safe);
+}
+.badge[data-level='safe'] .label {
+  color: var(--color-danger-safe);
+}
+
+.badge[data-level='caution'] {
+  background: var(--color-danger-caution-bg);
+}
+.badge[data-level='caution'] .dot {
+  background: var(--color-danger-caution);
+}
+.badge[data-level='caution'] .label {
+  color: var(--color-danger-caution);
+}
+
+.badge[data-level='destructive'] {
+  background: var(--color-danger-destructive-bg);
+}
+.badge[data-level='destructive'] .dot {
+  background: var(--color-danger-destructive);
+}
+.badge[data-level='destructive'] .label {
+  color: var(--color-danger-destructive);
+}

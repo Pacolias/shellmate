@@ -1,0 +1,123 @@
+import { useEffect, useRef } from 'react';
+import { Terminal } from '@xterm/xterm';
+import { FitAddon } from '@xterm/addon-fit';
+import type { CommandAnalysis } from '@shared/types/command';
+import { applyKeystroke } from './line-buffer';
+import { resolveXtermTheme } from './xterm-theme';
+
+const ANALYZE_DEBOUNCE_MS = 150;
+
+export interface ConfirmDestructiveDetails {
+  command: string;
+  reason: string;
+}
+
+export interface UseTerminalOptions {
+  /** Called with the live analysis of the current input line, or null once it's empty/submitted. */
+  onAnalysisChange: (analysis: CommandAnalysis | null) => void;
+  /** Awaited before a destructive command's Enter reaches the shell. Resolving false cancels it — the line stays in the shell's input buffer, untouched. */
+  onConfirmDestructive: (details: ConfirmDestructiveDetails) => Promise<boolean>;
+}
+
+/**
+ * Owns the xterm.js instance and its connection to the real pty over the
+ * shellmate bridge: writes keystrokes through, renders incoming data, keeps
+ * a local approximation of the current input line for live analysis (see
+ * line-buffer.ts), and gates Enter on confirmation when that analysis says
+ * the command is destructive.
+ */
+export function useTerminal(
+  containerRef: React.RefObject<HTMLDivElement | null>,
+  options: UseTerminalOptions,
+): void {
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const terminal = new Terminal({
+      cursorBlink: true,
+      fontFamily: 'var(--font-mono)',
+      fontSize: 14,
+      theme: resolveXtermTheme(),
+    });
+    const fitAddon = new FitAddon();
+    terminal.loadAddon(fitAddon);
+    terminal.open(container);
+    fitAddon.fit();
+
+    let lineBuffer = '';
+    let latestAnalysis: CommandAnalysis | null = null;
+    let analyzeTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const scheduleAnalysis = (input: string): void => {
+      clearTimeout(analyzeTimer);
+      if (input.trim().length === 0) {
+        latestAnalysis = null;
+        optionsRef.current.onAnalysisChange(null);
+        return;
+      }
+      analyzeTimer = setTimeout(() => {
+        void window.shellmate.command.analyze(input).then((analysis) => {
+          latestAnalysis = analysis;
+          optionsRef.current.onAnalysisChange(analysis);
+        });
+      }, ANALYZE_DEBOUNCE_MS);
+    };
+
+    void window.shellmate.pty.start({ cols: terminal.cols, rows: terminal.rows });
+
+    const offData = window.shellmate.pty.onData((chunk) => terminal.write(chunk));
+    const offExit = window.shellmate.pty.onExit(() => {
+      terminal.write('\r\n\x1b[2m[shell exited]\x1b[0m\r\n');
+    });
+
+    const inputDisposable = terminal.onData((input) => {
+      void handleInput(input);
+    });
+
+    async function handleInput(input: string): Promise<void> {
+      const isEnter = input === '\r' || input === '\n';
+
+      if (isEnter && latestAnalysis?.danger.level === 'destructive') {
+        terminal.options.disableStdin = true;
+        const confirmed = await optionsRef.current.onConfirmDestructive({
+          command: lineBuffer,
+          reason: latestAnalysis.danger.reason,
+        });
+        terminal.options.disableStdin = false;
+        terminal.focus();
+        if (!confirmed) return;
+      }
+
+      window.shellmate.pty.write(input);
+
+      const update = applyKeystroke(lineBuffer, input);
+      lineBuffer = update.buffer;
+      if (update.submitted) {
+        clearTimeout(analyzeTimer);
+        latestAnalysis = null;
+        optionsRef.current.onAnalysisChange(null);
+      } else {
+        scheduleAnalysis(lineBuffer);
+      }
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      fitAddon.fit();
+      window.shellmate.pty.resize(terminal.cols, terminal.rows);
+    });
+    resizeObserver.observe(container);
+
+    return () => {
+      resizeObserver.disconnect();
+      inputDisposable.dispose();
+      offData();
+      offExit();
+      clearTimeout(analyzeTimer);
+      terminal.dispose();
+    };
+  }, [containerRef]);
+}

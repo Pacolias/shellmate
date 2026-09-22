@@ -1,0 +1,67 @@
+:root {
+  --font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, 'Cascadia Code', monospace;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --color-bg-app: #f4f5f7;
+  --color-bg-panel: #ffffff;
+  --color-bg-terminal: #1e1f26;
+  --color-bg-sunken: #eceef2;
+  --color-border: #dde0e6;
+  --color-border-strong: #c3c8d1;
+
+  --color-text-primary: #1a1c23;
+  --color-text-secondary: #4b4f5b;
+  --color-text-muted: #868c99;
+  --color-text-on-terminal: #e7e9ee;
+
+  --color-accent: #2f6fed;
+  --color-accent-contrast: #ffffff;
+
+  --color-danger-safe: #1f8a56;
+  --color-danger-safe-bg: #e4f6ed;
+  --color-danger-caution: #b3760a;
+  --color-danger-caution-bg: #fbf0dc;
+  --color-danger-destructive: #c8412f;
+  --color-danger-destructive-bg: #fbe6e2;
+
+  --shadow-panel: 0 1px 2px rgba(20, 22, 30, 0.06), 0 8px 24px rgba(20, 22, 30, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg-app: #14151a;
+    --color-bg-panel: #1b1c23;
+    --color-bg-terminal: #131319;
+    --color-bg-sunken: #101117;
+    --color-border: #2a2c36;
+    --color-border-strong: #3a3d4a;
+
+    --color-text-primary: #eef0f4;
+    --color-text-secondary: #b5b9c6;
+    --color-text-muted: #7b7f8d;
+    --color-text-on-terminal: #e7e9ee;
+
+    --color-accent: #6fa1ff;
+    --color-accent-contrast: #0b1220;
+
+    --color-danger-safe: #4fd694;
+    --color-danger-safe-bg: rgba(79, 214, 148, 0.12);
+    --color-danger-caution: #f2b84b;
+    --color-danger-caution-bg: rgba(242, 184, 75, 0.12);
+    --color-danger-destructive: #ff7a68;
+    --color-danger-destructive-bg: rgba(255, 122, 104, 0.14);
+
+    --shadow-panel: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+}
