@@ -71,6 +71,18 @@ describe('OscStreamParser', () => {
     expect(events).toEqual([{ type: 'prompt-started' }]);
   });
 
+  it('passes through an unrecognized OSC 133 sub-marker rather than swallowing it', () => {
+    const { data, events } = run(['\x1b]133;Z\x07']);
+    expect(data).toBe('\x1b]133;Z\x07');
+    expect(events).toEqual([]);
+  });
+
+  it('passes through a malformed OSC 7 payload rather than swallowing it', () => {
+    const { data, events } = run(['\x1b]7;not-a-file-url\x07']);
+    expect(data).toBe('\x1b]7;not-a-file-url\x07');
+    expect(events).toEqual([]);
+  });
+
   it('passes through OSC sequences it does not own, e.g. a window title', () => {
     const { data, events } = run(['\x1b]0;my title\x07']);
     expect(data).toBe('\x1b]0;my title\x07');

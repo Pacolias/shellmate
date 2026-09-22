@@ -57,12 +57,14 @@ export class OscStreamParser {
       const fullSequence = this.pending.slice(0, terminator.sequenceEnd);
       this.pending = this.pending.slice(terminator.sequenceEnd);
 
-      const event = parseOscBody(body);
-      if (event) {
-        this.callbacks.onShellEvent(event);
-      } else {
+      const outcome = parseOscBody(body);
+      if (outcome.kind === 'event') {
+        this.callbacks.onShellEvent(outcome.event);
+      } else if (outcome.kind === 'passthrough') {
         this.callbacks.onData(fullSequence);
       }
+      // 'consumed': one of our own markers with nothing to report — dropped
+      // silently, neither turned into an event nor handed to xterm.js.
     }
   }
 
@@ -97,41 +99,56 @@ function findTerminator(buffer: string): Terminator | null {
   return null;
 }
 
-function parseOscBody(body: string): ShellEvent | null {
+/**
+ * `event`: turn it into a ShellEvent. `consumed`: it's ours, but this
+ * particular marker has no app-level meaning — drop it. `passthrough`:
+ * not confidently ours — hand the raw sequence to xterm.js rather than
+ * risk swallowing something another program relies on (OSC 133 in
+ * particular is used by more than one terminal-integration convention).
+ */
+type OscOutcome = { kind: 'event'; event: ShellEvent } | { kind: 'consumed' } | { kind: 'passthrough' };
+
+function parseOscBody(body: string): OscOutcome {
   const separatorIndex = body.indexOf(';');
   const id = separatorIndex === -1 ? body : body.slice(0, separatorIndex);
   const payload = separatorIndex === -1 ? '' : body.slice(separatorIndex + 1);
 
-  if (id === '133') return parsePromptEvent(payload);
-  if (id === '7') return parseCwdEvent(payload);
-  return null;
+  if (id === '133') return parsePromptOutcome(payload);
+  if (id === '7') return parseCwdOutcome(payload);
+  return { kind: 'passthrough' };
 }
 
-function parsePromptEvent(payload: string): ShellEvent | null {
+function parsePromptOutcome(payload: string): OscOutcome {
   const marker = payload[0];
   switch (marker) {
     case 'A':
-      return { type: 'prompt-started' };
+      return { kind: 'event', event: { type: 'prompt-started' } };
     case 'C':
       // Payload looks like "C;<base64-encoded command text>".
-      return { type: 'command-started', command: safeDecodeBase64(payload.slice(2)) };
+      return { kind: 'event', event: { type: 'command-started', command: safeDecodeBase64(payload.slice(2)) } };
     case 'D': {
       // Payload looks like "D;<exit_code>".
       const exitCode = Number.parseInt(payload.slice(2), 10);
-      return { type: 'command-finished', exitCode: Number.isNaN(exitCode) ? 0 : exitCode };
+      return {
+        kind: 'event',
+        event: { type: 'command-finished', exitCode: Number.isNaN(exitCode) ? 0 : exitCode },
+      };
     }
+    case 'B':
+      // Prompt end / input start — we emit it (see shell-init/), but have
+      // no app-level use for it yet (it's only for click-to-move-cursor
+      // features we don't have), so it's ours to consume, not pass through.
+      return { kind: 'consumed' };
     default:
-      // "B" (prompt end / input start) has no app-level event yet — it only
-      // matters for click-to-move-cursor features we don't have.
-      return null;
+      return { kind: 'passthrough' };
   }
 }
 
-function parseCwdEvent(payload: string): ShellEvent | null {
+function parseCwdOutcome(payload: string): OscOutcome {
   const withoutScheme = payload.replace(/^file:\/\//, '');
   const pathStart = withoutScheme.indexOf('/');
-  if (pathStart === -1) return null;
-  return { type: 'cwd-changed', cwd: safeDecodeUriComponent(withoutScheme.slice(pathStart)) };
+  if (pathStart === -1) return { kind: 'passthrough' };
+  return { kind: 'event', event: { type: 'cwd-changed', cwd: safeDecodeUriComponent(withoutScheme.slice(pathStart)) } };
 }
 
 function safeDecodeUriComponent(value: string): string {
