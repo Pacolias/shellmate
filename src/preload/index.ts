@@ -45,6 +45,11 @@ const bridge: ShellmateBridge = {
   pipeline: {
     preview: (raw) => ipcRenderer.invoke(IpcChannel.PipelinePreview, { raw }),
   },
+  safety: {
+    previewDestructive: (raw) => ipcRenderer.invoke(IpcChannel.SafetyPreviewDestructive, { raw }),
+    moveToTrash: (paths) => ipcRenderer.invoke(IpcChannel.SafetyMoveToTrash, { paths }),
+    restoreFromTrash: (trashedNames) => ipcRenderer.invoke(IpcChannel.SafetyRestoreFromTrash, { trashedNames }),
+  },
 };
 
 contextBridge.exposeInMainWorld('shellmate', bridge);

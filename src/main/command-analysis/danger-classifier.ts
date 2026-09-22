@@ -20,7 +20,7 @@ const SENSITIVE_PATH_PATTERNS: RegExp[] = [
   /^\/etc\/(passwd|shadow|sudoers|hosts|fstab)$/,
 ];
 
-interface EffectiveInvocation {
+export interface EffectiveInvocation {
   command: string | null;
   args: ParsedToken[];
   viaSudo: boolean;
@@ -107,7 +107,7 @@ function classifySegment(segment: ParsedSegment): DangerAssessment {
  * runs another command"). This recovers the command the shell will actually
  * run, so classification rules apply to it instead of to "sudo" itself.
  */
-function resolveEffectiveInvocation(segment: ParsedSegment): EffectiveInvocation {
+export function resolveEffectiveInvocation(segment: ParsedSegment): EffectiveInvocation {
   if (segment.command !== 'sudo') {
     return { command: segment.command, args: segment.tokens.slice(1), viaSudo: false };
   }

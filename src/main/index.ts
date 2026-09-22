@@ -8,7 +8,9 @@ import { registerFilesystemHandlers } from './ipc/filesystem.handlers';
 import { registerHistoryHandlers } from './ipc/history.handlers';
 import { registerPipelineHandlers } from './ipc/pipeline.handlers';
 import { registerPtyHandlers } from './ipc/pty.handlers';
+import { registerSafetyHandlers } from './ipc/safety.handlers';
 import { HistoryStore } from './history/history.store';
+import { TrashService } from './safety/trash.service';
 
 // Package.json declares "type": "module", so electron-vite builds main and
 // preload as real ESM (out/main/index.mjs, out/preload/index.mjs) — no
@@ -64,6 +66,7 @@ app.whenReady().then(() => {
   registerFilesystemHandlers();
   registerAiHandlers();
   registerPipelineHandlers();
+  registerSafetyHandlers(new TrashService());
 
   const historyStore = new HistoryStore(path.join(app.getPath('userData'), 'history.json'));
 

@@ -4,6 +4,7 @@ import type { ErrorMatch } from './types/errors';
 import type { ListDirectoryResult } from './types/filesystem';
 import type { HistoryEntry } from './types/history';
 import type { PipelinePreviewResult } from './types/pipeline';
+import type { DestructivePreview, TrashOutcome } from './types/safety';
 import type { ShellEvent } from './types/shell-events';
 
 /**
@@ -26,6 +27,9 @@ export const IpcChannel = {
   AiStatus: 'ai:status',
   AiGenerateCommand: 'ai:generate-command',
   PipelinePreview: 'pipeline:preview',
+  SafetyPreviewDestructive: 'safety:preview-destructive',
+  SafetyMoveToTrash: 'safety:move-to-trash',
+  SafetyRestoreFromTrash: 'safety:restore-from-trash',
 } as const;
 
 export interface PtyStartRequest {
@@ -83,6 +87,19 @@ export interface PipelinePreviewRequest {
   raw: string;
 }
 
+export interface SafetyPreviewRequest {
+  /** The full rm/mv command line as currently typed. */
+  raw: string;
+}
+
+export interface SafetyMoveToTrashRequest {
+  paths: string[];
+}
+
+export interface SafetyRestoreFromTrashRequest {
+  trashedNames: string[];
+}
+
 /** Renderer → main, request/response (`ipcRenderer.invoke` / `ipcMain.handle`). */
 export interface IpcInvokeMap {
   [IpcChannel.PtyStart]: { request: PtyStartRequest; response: void };
@@ -93,6 +110,9 @@ export interface IpcInvokeMap {
   [IpcChannel.AiStatus]: { request: void; response: AiStatus };
   [IpcChannel.AiGenerateCommand]: { request: AiGenerateCommandRequest; response: AiGenerateResult };
   [IpcChannel.PipelinePreview]: { request: PipelinePreviewRequest; response: PipelinePreviewResult };
+  [IpcChannel.SafetyPreviewDestructive]: { request: SafetyPreviewRequest; response: DestructivePreview | null };
+  [IpcChannel.SafetyMoveToTrash]: { request: SafetyMoveToTrashRequest; response: TrashOutcome[] };
+  [IpcChannel.SafetyRestoreFromTrash]: { request: SafetyRestoreFromTrashRequest; response: TrashOutcome[] };
 }
 
 /** Renderer → main, fire-and-forget (`ipcRenderer.send` / `ipcMain.on`). */

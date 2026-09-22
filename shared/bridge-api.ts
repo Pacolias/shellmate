@@ -4,6 +4,7 @@ import type { ListDirectoryResult } from './types/filesystem';
 import type { HistoryEntry } from './types/history';
 import type { CommandFailedEvent, PtyExitEvent, PtyStartRequest } from './ipc-contract';
 import type { PipelinePreviewResult } from './types/pipeline';
+import type { DestructivePreview, TrashOutcome } from './types/safety';
 import type { ShellEvent } from './types/shell-events';
 
 /**
@@ -40,6 +41,11 @@ export interface ShellmateBridge {
   };
   pipeline: {
     preview(raw: string): Promise<PipelinePreviewResult>;
+  };
+  safety: {
+    previewDestructive(raw: string): Promise<DestructivePreview | null>;
+    moveToTrash(paths: string[]): Promise<TrashOutcome[]>;
+    restoreFromTrash(trashedNames: string[]): Promise<TrashOutcome[]>;
   };
 }
 
