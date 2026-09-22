@@ -1,0 +1,51 @@
+{
+  "app": {
+    "title": "ShellMate"
+  },
+  "terminal": {
+    "startingShell": "Iniciando terminal…",
+    "confirmDestructive": {
+      "title": "Este comando puede ser destructivo",
+      "confirm": "Ejecutar de todas formas",
+      "cancel": "Cancelar"
+    }
+  },
+  "danger": {
+    "safe": "Seguro",
+    "caution": "Modifica archivos",
+    "destructive": "Destructivo"
+  },
+  "copilot": {
+    "subtitles": {
+      "title": "Subtítulos",
+      "emptyState": "Escribe un comando en la terminal para ver aquí una explicación en lenguaje sencillo."
+    },
+    "errors": {
+      "title": "Errores traducidos",
+      "emptyState": "Cuando un comando falle, aquí verás qué ha pasado y cómo solucionarlo."
+    },
+    "cheatsheet": {
+      "title": "Chuleta de ejemplos",
+      "comingSoon": "Disponible en la fase 3."
+    },
+    "naturalLanguage": {
+      "title": "Lenguaje natural",
+      "comingSoon": "Disponible en la fase 3."
+    }
+  },
+  "context": {
+    "map": {
+      "title": "Mapa del sistema de archivos",
+      "comingSoon": "Disponible en la fase 2."
+    },
+    "history": {
+      "title": "Historial como diario",
+      "comingSoon": "Disponible en la fase 2."
+    }
+  },
+  "helpLevel": {
+    "high": "Alto",
+    "medium": "Medio",
+    "low": "Bajo"
+  }
+}
