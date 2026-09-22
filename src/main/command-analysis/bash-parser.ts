@@ -70,5 +70,35 @@ function toSegment(node: TsNode): ParsedSegment {
     });
   }
 
+  // Redirects (`> file`, `>> file`, `<<< word`) are their own field, not
+  // arguments — but danger-classifier.ts needs to see them (writing to a
+  // sensitive path via `>` is exactly the kind of thing it has to catch),
+  // and pipeline preview needs them to reconstruct a stage's real command
+  // line. Kept as one token per redirect (operator + target together)
+  // rather than split further — nothing downstream needs them apart.
+  for (const redirectNode of collectRedirectNodes(node)) {
+    tokens.push({
+      kind: 'redirect',
+      text: redirectNode.text,
+      start: redirectNode.startIndex,
+      end: redirectNode.endIndex,
+    });
+  }
+
   return { command: nameNode?.text ?? null, tokens };
+}
+
+/**
+ * A `command` node's own `redirect` field only fires in some syntactic
+ * shapes. The common case — a redirect trailing a plain command, e.g.
+ * `echo hi > file` — instead wraps the command in a `redirected_statement`
+ * node, with the redirect(s) as *its* children, sibling to the command
+ * rather than inside it. Confirmed by dumping the actual parse tree rather
+ * than assuming from the grammar's field list.
+ */
+function collectRedirectNodes(commandNode: TsNode): TsNode[] {
+  const direct = commandNode.childrenForFieldName('redirect');
+  const parent = commandNode.parent;
+  const fromWrapper = parent?.type === 'redirected_statement' ? parent.childrenForFieldName('redirect') : [];
+  return [...direct, ...fromWrapper];
 }

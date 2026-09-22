@@ -2,9 +2,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { app, BrowserWindow, shell } from 'electron';
 import { electronApp, is, optimizer } from '@electron-toolkit/utils';
+import { registerAiHandlers } from './ipc/ai.handlers';
 import { registerCommandHandlers } from './ipc/command.handlers';
 import { registerFilesystemHandlers } from './ipc/filesystem.handlers';
 import { registerHistoryHandlers } from './ipc/history.handlers';
+import { registerPipelineHandlers } from './ipc/pipeline.handlers';
 import { registerPtyHandlers } from './ipc/pty.handlers';
 import { HistoryStore } from './history/history.store';
 
@@ -60,6 +62,8 @@ app.whenReady().then(() => {
 
   registerCommandHandlers();
   registerFilesystemHandlers();
+  registerAiHandlers();
+  registerPipelineHandlers();
 
   const historyStore = new HistoryStore(path.join(app.getPath('userData'), 'history.json'));
 

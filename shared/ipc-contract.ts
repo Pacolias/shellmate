@@ -1,7 +1,9 @@
+import type { AiGenerateResult, AiStatus } from './types/ai';
 import type { CommandAnalysis } from './types/command';
 import type { ErrorMatch } from './types/errors';
 import type { ListDirectoryResult } from './types/filesystem';
 import type { HistoryEntry } from './types/history';
+import type { PipelinePreviewResult } from './types/pipeline';
 import type { ShellEvent } from './types/shell-events';
 
 /**
@@ -21,6 +23,9 @@ export const IpcChannel = {
   HistoryList: 'history:list',
   HistorySaveRecipe: 'history:save-recipe',
   HistoryChanged: 'history:changed',
+  AiStatus: 'ai:status',
+  AiGenerateCommand: 'ai:generate-command',
+  PipelinePreview: 'pipeline:preview',
 } as const;
 
 export interface PtyStartRequest {
@@ -69,6 +74,15 @@ export interface SaveRecipeRequest {
   name: string;
 }
 
+export interface AiGenerateCommandRequest {
+  prompt: string;
+}
+
+export interface PipelinePreviewRequest {
+  /** The full pipeline command line as currently typed, not yet submitted. */
+  raw: string;
+}
+
 /** Renderer → main, request/response (`ipcRenderer.invoke` / `ipcMain.handle`). */
 export interface IpcInvokeMap {
   [IpcChannel.PtyStart]: { request: PtyStartRequest; response: void };
@@ -76,6 +90,9 @@ export interface IpcInvokeMap {
   [IpcChannel.FilesystemListDirectory]: { request: ListDirectoryRequest; response: ListDirectoryResult };
   [IpcChannel.HistoryList]: { request: void; response: HistoryEntry[] };
   [IpcChannel.HistorySaveRecipe]: { request: SaveRecipeRequest; response: HistoryEntry | null };
+  [IpcChannel.AiStatus]: { request: void; response: AiStatus };
+  [IpcChannel.AiGenerateCommand]: { request: AiGenerateCommandRequest; response: AiGenerateResult };
+  [IpcChannel.PipelinePreview]: { request: PipelinePreviewRequest; response: PipelinePreviewResult };
 }
 
 /** Renderer → main, fire-and-forget (`ipcRenderer.send` / `ipcMain.on`). */

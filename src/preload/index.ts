@@ -38,6 +38,13 @@ const bridge: ShellmateBridge = {
     saveRecipe: (id, name) => ipcRenderer.invoke(IpcChannel.HistorySaveRecipe, { id, name }),
     onChanged: (listener) => onIpc<HistoryEntry>(IpcChannel.HistoryChanged, listener),
   },
+  ai: {
+    status: () => ipcRenderer.invoke(IpcChannel.AiStatus),
+    generateCommand: (prompt) => ipcRenderer.invoke(IpcChannel.AiGenerateCommand, { prompt }),
+  },
+  pipeline: {
+    preview: (raw) => ipcRenderer.invoke(IpcChannel.PipelinePreview, { raw }),
+  },
 };
 
 contextBridge.exposeInMainWorld('shellmate', bridge);

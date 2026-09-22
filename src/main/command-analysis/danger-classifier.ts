@@ -12,6 +12,12 @@ const SENSITIVE_PATH_PATTERNS: RegExp[] = [
   /^~\/?$/, // the whole home directory, unqualified
   /^\*$/, // a bare wildcard, likely to sweep an entire directory
   /^\/(etc|boot|bin|usr|lib|sys|dev)\/?$/, // top-level system directories
+  // A handful of specific files, not just directories — worth naming
+  // individually because overwriting one via a redirect (`echo x >
+  // /etc/passwd`) is a realistic, specific way to break a system that the
+  // directory-level patterns above don't catch (they only match `/etc`
+  // itself, not a file inside it).
+  /^\/etc\/(passwd|shadow|sudoers|hosts|fstab)$/,
 ];
 
 interface EffectiveInvocation {
@@ -54,6 +60,9 @@ function classifySegment(segment: ParsedSegment): DangerAssessment {
 
   const flags = args.filter((token) => token.kind === 'flag').map((token) => token.text);
   const positionalArgs = args.filter((token) => token.kind === 'argument').map((token) => token.text);
+  const writeRedirectTargets = args
+    .filter((token) => token.kind === 'redirect' && isWriteRedirectText(token.text))
+    .map((token) => redirectTarget(token.text));
 
   if (command === 'rm' && hasRecursiveFlag(flags)) {
     level = 'destructive';
@@ -62,10 +71,22 @@ function classifySegment(segment: ParsedSegment): DangerAssessment {
       : 'Borra carpetas enteras (y su contenido) sin posibilidad de deshacerlo desde aquí.';
   }
 
+  // A write redirect (`>`, `>>`, ...) modifies the filesystem regardless of
+  // what the base command's own danger level says — `echo x > file` is not
+  // "safe" just because echo normally is. Read redirects (`<`, `<<<`) are
+  // left alone; those don't write anything.
+  if (writeRedirectTargets.length > 0) {
+    level = maxLevel(level, 'caution');
+    reason ??= 'Escribe en un archivo mediante una redirección.';
+  }
+
   // Only escalate for a sensitive target if the command already modifies
   // something — reading a sensitive path (e.g. `ls /etc`) is not dangerous.
+  // Redirect targets count here too: `sort < /etc/shadow > /dev/null` reads
+  // a sensitive file but writes to a harmless one, and the reverse matters
+  // just as much as a sensitive positional argument does.
   if (level !== 'safe') {
-    const sensitiveTarget = positionalArgs.find(isSensitivePathArgument);
+    const sensitiveTarget = [...positionalArgs, ...writeRedirectTargets].find(isSensitivePathArgument);
     if (sensitiveTarget) {
       level = 'destructive';
       reason = `Apunta a una ruta sensible del sistema ("${sensitiveTarget}").`;
@@ -115,6 +136,17 @@ function isShortFlagCluster(flag: string, letter: string): boolean {
 
 function isSensitivePathArgument(text: string): boolean {
   return SENSITIVE_PATH_PATTERNS.some((pattern) => pattern.test(text));
+}
+
+/** A redirect token's text is "operator target" (e.g. "> file", "2>> log", "<<< word"). True for any operator that writes (`>`, `>>`, `&>`, `2>`, ...) — false for pure input redirects (`<`, `<<<`), which don't write anything. */
+function isWriteRedirectText(text: string): boolean {
+  const operator = text.split(/\s+/, 1)[0] ?? '';
+  return operator.includes('>');
+}
+
+function redirectTarget(text: string): string {
+  const spaceIndex = text.indexOf(' ');
+  return spaceIndex === -1 ? '' : text.slice(spaceIndex + 1).trim();
 }
 
 function maxLevel(a: DangerLevel, b: DangerLevel): DangerLevel {

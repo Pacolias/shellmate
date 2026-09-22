@@ -7,7 +7,7 @@ export interface DangerAssessment {
   reason: string;
 }
 
-export type ParsedTokenKind = 'command' | 'flag' | 'argument';
+export type ParsedTokenKind = 'command' | 'flag' | 'argument' | 'redirect';
 
 export interface ParsedToken {
   kind: ParsedTokenKind;

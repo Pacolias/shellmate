@@ -5,6 +5,7 @@ import { annotateCommand } from '../command-analysis/command-dictionary';
 import { lookupError } from '../command-analysis/error-catalog';
 import { deriveHistoryLabel } from '../command-analysis/history-label';
 import type { HistoryStore } from '../history/history.store';
+import { currentSessionState } from '../pty/current-session-state';
 import { PtySession } from '../pty/pty-session';
 import { OscStreamParser } from '../shell-events/osc-parser';
 import { RecentOutputTracker } from '../shell-events/recent-output-tracker';
@@ -27,7 +28,6 @@ export function registerPtyHandlers(getWebContents: () => WebContents | null, hi
   const session = new PtySession();
   const outputTracker = new RecentOutputTracker();
   let lastCommandRaw: string | null = null;
-  let lastCwd: string | null = null;
   let commandStartedAt: number | null = null;
 
   const oscParser = new OscStreamParser({
@@ -37,7 +37,7 @@ export function registerPtyHandlers(getWebContents: () => WebContents | null, hi
     },
     onShellEvent: (event) => {
       if (event.type === 'cwd-changed') {
-        lastCwd = event.cwd;
+        currentSessionState.cwd = event.cwd;
       }
 
       if (event.type === 'command-started') {
@@ -59,7 +59,14 @@ export function registerPtyHandlers(getWebContents: () => WebContents | null, hi
           });
         }
 
-        void recordHistoryEntry(historyStore, getWebContents, lastCommandRaw, lastCwd, event.exitCode, commandStartedAt);
+        void recordHistoryEntry(
+          historyStore,
+          getWebContents,
+          lastCommandRaw,
+          currentSessionState.cwd,
+          event.exitCode,
+          commandStartedAt,
+        );
       }
 
       getWebContents()?.send(IpcChannel.ShellEvent, event);

@@ -1,7 +1,9 @@
+import type { AiGenerateResult, AiStatus } from './types/ai';
 import type { CommandAnalysis } from './types/command';
 import type { ListDirectoryResult } from './types/filesystem';
 import type { HistoryEntry } from './types/history';
 import type { CommandFailedEvent, PtyExitEvent, PtyStartRequest } from './ipc-contract';
+import type { PipelinePreviewResult } from './types/pipeline';
 import type { ShellEvent } from './types/shell-events';
 
 /**
@@ -31,6 +33,13 @@ export interface ShellmateBridge {
     list(): Promise<HistoryEntry[]>;
     saveRecipe(id: string, name: string): Promise<HistoryEntry | null>;
     onChanged(listener: (entry: HistoryEntry) => void): () => void;
+  };
+  ai: {
+    status(): Promise<AiStatus>;
+    generateCommand(prompt: string): Promise<AiGenerateResult>;
+  };
+  pipeline: {
+    preview(raw: string): Promise<PipelinePreviewResult>;
   };
 }
 

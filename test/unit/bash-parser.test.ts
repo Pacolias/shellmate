@@ -44,6 +44,16 @@ describe('parseCommand', () => {
     expect(result.hasSyntaxError).toBe(true);
   });
 
+  it('captures a redirect as its own token, separate from arguments', async () => {
+    const result = await parseCommand('echo hello > /etc/passwd');
+    const [segment] = result.segments;
+    expect(segment?.tokens.map((t) => [t.kind, t.text])).toEqual([
+      ['command', 'echo'],
+      ['argument', 'hello'],
+      ['redirect', '> /etc/passwd'],
+    ]);
+  });
+
   it('records token byte offsets that round-trip against the raw input', async () => {
     const raw = 'rm -rf /tmp/build';
     const result = await parseCommand(raw);

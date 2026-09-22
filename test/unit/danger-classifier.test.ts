@@ -22,6 +22,12 @@ function parsed(...segments: ParsedSegment[]): ParsedCommand {
   return { raw: '', segments, hasSyntaxError: false };
 }
 
+function segmentWithRedirect(command: string, args: string[], redirectText: string): ParsedSegment {
+  const base = segment(command, args);
+  base.tokens.push({ kind: 'redirect', text: redirectText, start: 0, end: redirectText.length });
+  return base;
+}
+
 describe('classifyCommand', () => {
   it('treats an empty command line as safe', () => {
     expect(classifyCommand(parsed())).toEqual({ level: 'safe', reason: expect.any(String) });
@@ -100,6 +106,32 @@ describe('classifyCommand', () => {
 
   it('takes the worst level across all segments of a pipeline/chain', () => {
     const result = classifyCommand(parsed(segment('ls', []), segment('rm', ['-rf', '/tmp/x'])));
+    expect(result.level).toBe('destructive');
+  });
+
+  it('escalates an otherwise-safe command with a write redirect to caution', () => {
+    const result = classifyCommand(parsed(segmentWithRedirect('echo', ['hello'], '> notes.txt')));
+    expect(result.level).toBe('caution');
+  });
+
+  it('escalates a write redirect targeting a sensitive path to destructive', () => {
+    const result = classifyCommand(parsed(segmentWithRedirect('echo', ['x'], '> /etc/passwd')));
+    expect(result.level).toBe('destructive');
+    expect(result.reason).toMatch(/ruta sensible/);
+  });
+
+  it('does not escalate a read redirect (input, not a write)', () => {
+    const result = classifyCommand(parsed(segmentWithRedirect('cat', [], '< /etc/passwd')));
+    expect(result.level).toBe('safe');
+  });
+
+  it('treats append (>>) the same as overwrite (>) for escalation', () => {
+    const result = classifyCommand(parsed(segmentWithRedirect('echo', ['x'], '>> notes.txt')));
+    expect(result.level).toBe('caution');
+  });
+
+  it('recognizes specific sensitive files, not just directories, as positional arguments', () => {
+    const result = classifyCommand(parsed(segment('rm', ['/etc/shadow'])));
     expect(result.level).toBe('destructive');
   });
 });
