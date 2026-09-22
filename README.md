@@ -4,15 +4,8 @@
 
 ShellMate is not a simulated terminal and not a chatbot with a command box bolted on. It runs your actual shell (`bash`/`zsh`, your real aliases, your real `.rc` files) and wraps it in a live danger semaphore, plain-language subtitles, translated errors, a filesystem map, a command diary, and an optional AI copilot — all of which you can dial down, panel by panel, as you stop needing them.
 
-<!--
-  Screenshots / GIF placeholders — drop real captures here before publishing.
-  Suggested shots: the three-column layout at rest; the semaphore turning
-  red mid-keystroke with the destructive-confirmation dialog; the pipeline
-  view showing real intermediate output; the help-level slider at "Bajo".
--->
-
 ![ShellMate — three-column layout](docs/screenshots/overview.png)
-![Destructive command caught live](docs/screenshots/semaphore-confirm.gif)
+![Destructive command caught live](docs/screenshots/semaphore-confirm.png)
 
 ## The problem
 
