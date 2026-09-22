@@ -1,4 +1,4 @@
-# AI provider: built without a live key, not yet verified end to end
+# AI provider: verified end to end with a real Gemini call
 
 **Date:** 2026-09-22
 **Phase:** Phase 3
@@ -7,12 +7,27 @@
 
 `GeminiProvider` (`@google/genai`) and `AnthropicProvider`
 (`@anthropic-ai/sdk`) are fully implemented per
-`journal/2026-09-22-ai-provider-abstraction.md`'s original design, but
-**no real API call has been made against either** — the project owner
-doesn't have a `GEMINI_API_KEY` ready yet, and confirmed building ahead
-without one rather than waiting.
+`journal/2026-09-22-ai-provider-abstraction.md`'s original design. Built
+without a live key at first (see the original version of this entry, kept
+below); once the project owner added a real `GEMINI_API_KEY` to `.env`
+(see `journal/2026-09-22-dotenv-support.md`), it was tested for real.
 
-## What was verified without a key
+## What the real call found
+
+The first live request failed with a 404: **`gemini-2.5-flash` had
+already been retired** — Gemini's own error message pointed at the
+replacement (`gemini-3.6-flash`). Exactly the risk this entry originally
+flagged as unverified. Fixed by updating `gemini.provider.ts`'s `MODEL`
+constant; re-ran the same request and got a correct result: prompt "lista
+los archivos ocultos del directorio actual" → `ls -d .*` with a matching
+explanation, correctly re-classified `safe` by the local danger
+classifier, and inserted into the terminal (help level was "Alto").
+
+`AnthropicProvider` / `claude-haiku-4-5-20251001` is **still unverified**
+— only a Gemini key was available. Same category of risk applies; check
+it the same way (one real request) before relying on it.
+
+## What was verified without a key (original entry, still accurate)
 
 - Both SDKs' actual TypeScript type definitions were read directly
   (`npm pack` + inspect `.d.ts`, not guessed from memory or docs) to get
@@ -29,22 +44,12 @@ without one rather than waiting.
 - `ai-service.ts`'s provider selection, the `no-api-key` short-circuit
   (never even attempts a call when unconfigured), and danger
   re-classification are unit tested and pass.
-- `npm run typecheck` and `npm run build` are clean with both SDKs as real
-  dependencies.
 
-## What is NOT verified
+## Lesson
 
-- That the actual API calls succeed, return well-formed JSON matching the
-  schema, or that the specific model ids used
-  (`gemini-2.5-flash`, `claude-haiku-4-5-20251001`) are still valid/current
-  by the time this is tested for real.
-- That the system prompt actually produces good command suggestions in
-  practice.
-
-## Action item
-
-Once a `GEMINI_API_KEY` (or `ANTHROPIC_API_KEY` + `AI_PROVIDER=anthropic`)
-is available: test a handful of real prompts through the natural-language
-panel, and specifically watch for (a) the model ids above still resolving,
-(b) `responseSchema`/tool-forced output actually staying valid JSON under
-real model behavior, not just the documented contract.
+This is the second time in this project a hardcoded model/API detail
+turned out to be stale the moment it was actually exercised (see also the
+`vite-plugin-static-copy` environment-name and directory-structure
+surprises in `journal/2026-09-22-static-assets-in-main-bundle.md`). A
+model id that type-checks and matches the SDK's shape is not the same
+claim as "this model still exists" — the only way to know is a real call.

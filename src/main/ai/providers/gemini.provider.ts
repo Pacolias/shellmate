@@ -2,10 +2,10 @@ import { GoogleGenAI, Type } from '@google/genai';
 import { AI_SYSTEM_PROMPT, buildPrompt, parseProviderJson } from '../ai-provider';
 import type { AiProvider, AiProviderRequest, AiProviderResponse } from '../ai-provider';
 
-// Not verified against a live call — no API key was available while
-// building this (see journal/2026-09-22-ai-provider.md). Worth
-// double-checking this is still a valid model id once real usage starts.
-const MODEL = 'gemini-2.5-flash';
+// Verified against a live call on 2026-09-22 (see
+// journal/2026-09-22-ai-provider.md) — the original 'gemini-2.5-flash'
+// had already been retired, and the API's own 404 pointed at this one.
+const MODEL = 'gemini-3.6-flash';
 
 export class GeminiProvider implements AiProvider {
   readonly name = 'gemini';
