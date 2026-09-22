@@ -11,5 +11,12 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['test/unit/**/*.test.ts'],
+    env: {
+      // bash-parser.ts assumes it's running from the electron-vite bundle
+      // (out/main/) and looks for grammars/ next to itself there. Under
+      // vitest it runs straight from src/, so point it at the real
+      // grammars/ directory directly instead.
+      SHELLMATE_GRAMMAR_PATH: resolve(__dirname, 'grammars/tree-sitter-bash.wasm'),
+    },
   },
 });

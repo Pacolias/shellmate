@@ -12,6 +12,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "types": ["node"],
+    "baseUrl": ".",
     "paths": {
       "@shared/*": ["shared/*"]
     },

@@ -12,6 +12,7 @@
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
+    "baseUrl": ".",
     "paths": {
       "@shared/*": ["shared/*"],
       "@renderer/*": ["src/renderer/src/*"]

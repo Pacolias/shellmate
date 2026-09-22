@@ -6,9 +6,12 @@ import type { ParsedCommand, ParsedSegment, ParsedToken } from '@shared/types/co
 // electron-vite bundles the main process into a single out/main/index.js, so
 // this always resolves relative to that directory, not to this source
 // file's location — grammars/ is copied there at build time (see
-// electron.vite.config.ts's viteStaticCopy targets).
+// electron.vite.config.ts's viteStaticCopy targets). Vitest, however, runs
+// this file straight from src/, where that bundled-output assumption is
+// wrong — vitest.config.ts points SHELLMATE_GRAMMAR_PATH at the real
+// grammars/ directory instead for that context.
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
-const GRAMMAR_PATH = path.join(moduleDir, 'grammars', 'tree-sitter-bash.wasm');
+const GRAMMAR_PATH = process.env.SHELLMATE_GRAMMAR_PATH ?? path.join(moduleDir, 'grammars', 'tree-sitter-bash.wasm');
 
 let parserPromise: Promise<Parser> | undefined;
 
