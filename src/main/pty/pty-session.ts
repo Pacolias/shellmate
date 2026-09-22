@@ -32,7 +32,14 @@ export class PtySession {
 
   start(options: PtySessionOptions): void {
     if (this.ptyProcess) {
-      throw new Error('PtySession already started');
+      // Idempotent by design, not just defensive: React's StrictMode
+      // double-invokes effects in dev (mount → cleanup → mount again), so
+      // the renderer's terminal setup effect calls pty:start twice in a
+      // row. There's no matching "stop" — the session outlives any single
+      // xterm.js instance subscribing to it — so a second start() while one
+      // is already running is expected, not an error.
+      this.resize(options.cols, options.rows);
+      return;
     }
 
     const shell = detectShell();
