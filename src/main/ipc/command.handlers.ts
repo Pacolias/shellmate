@@ -1,8 +1,8 @@
 import { ipcMain } from 'electron';
-import { IpcChannel, type CommandAnalyzeRequest } from '@shared/ipc-contract';
+import { IpcChannel, type CommandAnalyzeRequest, type CommandDictionaryEntryRequest } from '@shared/ipc-contract';
 import type { CommandAnalysis } from '@shared/types/command';
 import { parseCommand } from '../command-analysis/bash-parser';
-import { annotateCommand } from '../command-analysis/command-dictionary';
+import { annotateCommand, getDictionaryEntry } from '../command-analysis/command-dictionary';
 import { classifyCommand } from '../command-analysis/danger-classifier';
 
 export function registerCommandHandlers(): void {
@@ -14,4 +14,8 @@ export function registerCommandHandlers(): void {
       return { parsed: annotateCommand(parsed), danger };
     },
   );
+
+  ipcMain.handle(IpcChannel.CommandDictionaryEntry, (_event, request: CommandDictionaryEntryRequest) => {
+    return getDictionaryEntry(request.name);
+  });
 }

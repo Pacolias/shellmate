@@ -7,8 +7,31 @@
     "confirmDestructive": {
       "title": "Este comando puede ser destructivo",
       "confirm": "Ejecutar de todas formas",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "moveToTrash": "Mover a la papelera",
+      "previewLoading": "Calculando qué se verá afectado…",
+      "previewMissing": "no existe",
+      "previewNoMatches": "sin coincidencias",
+      "destination": "Destino"
+    },
+    "pipeline": {
+      "button": "Ver vista de tuberías",
+      "title": "Vista de tuberías",
+      "stage": "Etapa",
+      "truncated": "(salida recortada)",
+      "close": "Cerrar",
+      "loading": "Ejecutando cada etapa por separado…"
+    },
+    "table": {
+      "button": "Ver como tabla",
+      "close": "Ver como texto"
     }
+  },
+  "safety": {
+    "movedToTrash": "Movido a la papelera",
+    "movedToTrashFailed": "No se ha podido mover a la papelera",
+    "undo": "Deshacer",
+    "restored": "Restaurado"
   },
   "danger": {
     "safe": "Seguro",
@@ -28,11 +51,22 @@
     },
     "cheatsheet": {
       "title": "Chuleta de ejemplos",
-      "comingSoon": "Disponible en la fase 3."
+      "emptyState": "Escribe un comando conocido en la terminal para ver ejemplos y sus opciones.",
+      "examplesTitle": "Ejemplos",
+      "flagsTitle": "Opciones"
     },
     "naturalLanguage": {
       "title": "Lenguaje natural",
-      "comingSoon": "Disponible en la fase 3."
+      "placeholder": "Describe lo que quieres hacer…",
+      "ask": "Preguntar",
+      "loading": "Pensando…",
+      "setupTitle": "Configura tu IA para activar este panel",
+      "setupBody": "Añade tu clave a esta variable de entorno y reinicia la app:",
+      "errorPrefix": "No se ha podido generar el comando",
+      "noCommand": "No se ha podido convertir esto en un único comando.",
+      "insertedNote": "Insertado en la terminal — revísalo antes de pulsar Enter.",
+      "typeItYourself": "Escríbelo tú mismo en la terminal:",
+      "lowHelpNote": "A este nivel solo se muestran pistas, no el comando completo."
     }
   },
   "context": {

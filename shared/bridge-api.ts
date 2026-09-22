@@ -1,5 +1,6 @@
 import type { AiGenerateResult, AiStatus } from './types/ai';
 import type { CommandAnalysis } from './types/command';
+import type { CommandDictionaryEntry } from './types/command-dictionary';
 import type { ListDirectoryResult } from './types/filesystem';
 import type { HistoryEntry } from './types/history';
 import type { CommandFailedEvent, PtyExitEvent, PtyStartRequest } from './ipc-contract';
@@ -26,6 +27,7 @@ export interface ShellmateBridge {
   };
   command: {
     analyze(input: string): Promise<CommandAnalysis>;
+    dictionaryEntry(name: string): Promise<CommandDictionaryEntry | null>;
   };
   filesystem: {
     listDirectory(path: string): Promise<ListDirectoryResult>;

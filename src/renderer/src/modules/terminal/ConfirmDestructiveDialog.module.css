@@ -10,7 +10,8 @@
 }
 
 .dialog {
-  width: min(420px, calc(100% - var(--space-6)));
+  width: min(480px, calc(100% - var(--space-6)));
+  max-height: calc(100% - var(--space-6));
   background: var(--color-bg-panel);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -19,6 +20,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  overflow: hidden;
 }
 
 .badge {
@@ -57,11 +59,62 @@
   font-size: 13px;
 }
 
+.previewLoading {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.preview {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.destination {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.previewList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  max-height: 160px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-sunken);
+}
+
+.previewMatch,
+.previewMissing {
+  padding: 3px var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  word-break: break-all;
+}
+
+.previewMissing {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.trashFailures {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
 .actions {
   margin-top: var(--space-3);
   display: flex;
   justify-content: flex-end;
   gap: var(--space-2);
+  flex-wrap: wrap;
 }
 
 .actions button {
@@ -73,12 +126,27 @@
   cursor: pointer;
 }
 
+.actions button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .cancel {
   background: var(--color-bg-panel);
   color: var(--color-text-primary);
 }
 
 .cancel:hover {
+  background: var(--color-bg-sunken);
+}
+
+.trash {
+  background: var(--color-bg-panel);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.trash:hover {
   background: var(--color-bg-sunken);
 }
 

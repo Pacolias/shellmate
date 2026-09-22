@@ -7,6 +7,7 @@
 }
 
 .terminalFrame {
+  position: relative;
   flex: 1;
   min-height: 0;
   border-radius: var(--radius-md);
@@ -15,6 +16,32 @@
   padding: var(--space-2);
   transition: border-color 160ms ease;
   overflow: hidden;
+}
+
+.toolbar {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  z-index: 5;
+  display: flex;
+  gap: var(--space-1);
+}
+
+.toolbarButton {
+  border: 1px solid var(--color-border-strong);
+  background: color-mix(in srgb, var(--color-bg-panel) 85%, transparent);
+  color: var(--color-text-primary);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+.toolbarButton:hover {
+  background: var(--color-bg-panel);
+  border-color: var(--color-accent);
 }
 
 .terminalFrame[data-danger='safe'] {

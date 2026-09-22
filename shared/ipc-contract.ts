@@ -1,5 +1,6 @@
 import type { AiGenerateResult, AiStatus } from './types/ai';
 import type { CommandAnalysis } from './types/command';
+import type { CommandDictionaryEntry } from './types/command-dictionary';
 import type { ErrorMatch } from './types/errors';
 import type { ListDirectoryResult } from './types/filesystem';
 import type { HistoryEntry } from './types/history';
@@ -20,6 +21,7 @@ export const IpcChannel = {
   ShellEvent: 'shell:event',
   CommandFailed: 'command:failed',
   CommandAnalyze: 'command:analyze',
+  CommandDictionaryEntry: 'command:dictionary-entry',
   FilesystemListDirectory: 'filesystem:list-directory',
   HistoryList: 'history:list',
   HistorySaveRecipe: 'history:save-recipe',
@@ -52,6 +54,10 @@ export interface PtyExitEvent {
 
 export interface CommandAnalyzeRequest {
   input: string;
+}
+
+export interface CommandDictionaryEntryRequest {
+  name: string;
 }
 
 /**
@@ -104,6 +110,7 @@ export interface SafetyRestoreFromTrashRequest {
 export interface IpcInvokeMap {
   [IpcChannel.PtyStart]: { request: PtyStartRequest; response: void };
   [IpcChannel.CommandAnalyze]: { request: CommandAnalyzeRequest; response: CommandAnalysis };
+  [IpcChannel.CommandDictionaryEntry]: { request: CommandDictionaryEntryRequest; response: CommandDictionaryEntry | null };
   [IpcChannel.FilesystemListDirectory]: { request: ListDirectoryRequest; response: ListDirectoryResult };
   [IpcChannel.HistoryList]: { request: void; response: HistoryEntry[] };
   [IpcChannel.HistorySaveRecipe]: { request: SaveRecipeRequest; response: HistoryEntry | null };

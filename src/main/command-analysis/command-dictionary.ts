@@ -25,6 +25,11 @@ export function lookupCommand(name: string): CommandEntry | undefined {
   return dictionary[name];
 }
 
+/** Same data as `lookupCommand`, just null instead of undefined — the shape the cheatsheet module gets over IPC (shared/types/command-dictionary.ts). */
+export function getDictionaryEntry(name: string): CommandEntry | null {
+  return dictionary[name] ?? null;
+}
+
 export function baseDangerFor(name: string): DangerLevel | undefined {
   return dictionary[name]?.baseDanger;
 }

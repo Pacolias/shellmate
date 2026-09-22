@@ -1,0 +1,124 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.heading {
+  margin: 0 0 var(--space-3);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.form {
+  display: flex;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-sunken);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  padding: 6px 10px;
+}
+
+.askButton {
+  flex-shrink: 0;
+  border: 1px solid var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.askButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.loading {
+  margin: var(--space-2) 0 0;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.result {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.command {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--color-bg-sunken);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2);
+  align-self: flex-start;
+  word-break: break-word;
+}
+
+.explanation {
+  margin: var(--space-2) 0 0;
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+
+.hint {
+  margin: 0;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.error {
+  margin-top: var(--space-2);
+  font-size: 12px;
+  color: var(--color-danger-destructive);
+}
+
+.setup {
+  margin-top: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+}
+
+.setupTitle {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.setupBody {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.envVar {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--color-bg-sunken);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+}

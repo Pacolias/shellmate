@@ -1,4 +1,5 @@
 import { ipcMain, type IpcMainInvokeEvent, type WebContents } from 'electron';
+import { extractCommandName } from '@shared/command-text';
 import { IpcChannel, type PtyResizeMessage, type PtyStartRequest, type PtyWriteMessage } from '@shared/ipc-contract';
 import { parseCommand } from '../command-analysis/bash-parser';
 import { annotateCommand } from '../command-analysis/command-dictionary';
@@ -87,14 +88,6 @@ export function registerPtyHandlers(getWebContents: () => WebContents | null, hi
   ipcMain.on(IpcChannel.PtyResize, (_event, message: PtyResizeMessage) => {
     session.resize(message.cols, message.rows);
   });
-}
-
-/** "sudo apt install git" → "apt", "ls -la" → "ls" — mirrors how the danger classifier unwraps sudo, but string-based since we only need the bare name here, not a full parse. */
-function extractCommandName(raw: string): string | null {
-  const tokens = raw.trim().split(/\s+/).filter(Boolean);
-  if (tokens.length === 0) return null;
-  if (tokens[0] === 'sudo' && tokens.length > 1) return tokens[1] ?? null;
-  return tokens[0] ?? null;
 }
 
 async function recordHistoryEntry(

@@ -29,6 +29,7 @@ const bridge: ShellmateBridge = {
   },
   command: {
     analyze: (input) => ipcRenderer.invoke(IpcChannel.CommandAnalyze, { input }),
+    dictionaryEntry: (name) => ipcRenderer.invoke(IpcChannel.CommandDictionaryEntry, { name }),
   },
   filesystem: {
     listDirectory: (path) => ipcRenderer.invoke(IpcChannel.FilesystemListDirectory, { path }),

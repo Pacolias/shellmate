@@ -6,6 +6,10 @@ import { applyKeystroke } from './line-buffer';
 import { resolveXtermTheme } from './xterm-theme';
 
 const ANALYZE_DEBOUNCE_MS = 150;
+// A ctrl+U the code sends itself to discard a stale line (e.g. after
+// moving files to the trash instead of running the typed rm) — a plain
+// escape sequence, not routed through the destructive-confirmation gate.
+const CLEAR_LINE = '\x15';
 
 export interface ConfirmDestructiveDetails {
   command: string;
@@ -17,6 +21,8 @@ export interface UseTerminalOptions {
   onAnalysisChange: (analysis: CommandAnalysis | null) => void;
   /** Awaited before a destructive command's Enter reaches the shell. Resolving false cancels it — the line stays in the shell's input buffer, untouched. */
   onConfirmDestructive: (details: ConfirmDestructiveDetails) => Promise<boolean>;
+  /** The raw output produced by the command that just finished (regardless of exit code), for the "view as table" feature — real terminals don't expose this after the fact, so it's captured as it streams by. */
+  onCommandFinished?: (command: string | null, rawOutput: string) => void;
 }
 
 export interface UseTerminalHandle {
@@ -29,6 +35,10 @@ export interface UseTerminalHandle {
    * it themselves.
    */
   insertText: (text: string) => Promise<void>;
+  /** Sends Ctrl+U — discards whatever's currently typed, in both the real shell and our local tracking. Used after moving files to the trash instead of running the rm the user actually typed, so a stray Enter afterwards can't resubmit a now-stale command. */
+  clearCurrentLine: () => void;
+  /** Writes text straight to the terminal display — never sent to the shell. Used for local, app-generated messages (e.g. a trash confirmation) that aren't shell output. */
+  writeSystemLine: (text: string) => void;
 }
 
 /**
@@ -45,6 +55,7 @@ export function useTerminal(
   const optionsRef = useRef(options);
   optionsRef.current = options;
   const handleInputRef = useRef<((input: string) => Promise<void>) | null>(null);
+  const terminalRef = useRef<Terminal | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -56,6 +67,7 @@ export function useTerminal(
       fontSize: 14,
       theme: resolveXtermTheme(),
     });
+    terminalRef.current = terminal;
     const fitAddon = new FitAddon();
     terminal.loadAddon(fitAddon);
     terminal.open(container);
@@ -64,6 +76,8 @@ export function useTerminal(
     let lineBuffer = '';
     let latestAnalysis: CommandAnalysis | null = null;
     let analyzeTimer: ReturnType<typeof setTimeout> | undefined;
+    let lastCommandText: string | null = null;
+    let outputSinceCommandStart = '';
 
     const scheduleAnalysis = (input: string): void => {
       clearTimeout(analyzeTimer);
@@ -82,9 +96,21 @@ export function useTerminal(
 
     void window.shellmate.pty.start({ cols: terminal.cols, rows: terminal.rows });
 
-    const offData = window.shellmate.pty.onData((chunk) => terminal.write(chunk));
+    const offData = window.shellmate.pty.onData((chunk) => {
+      outputSinceCommandStart += chunk;
+      terminal.write(chunk);
+    });
     const offExit = window.shellmate.pty.onExit(() => {
       terminal.write('\r\n\x1b[2m[shell exited]\x1b[0m\r\n');
+    });
+    const offShellEvent = window.shellmate.shell.onEvent((event) => {
+      if (event.type === 'command-started') {
+        lastCommandText = event.command;
+        outputSinceCommandStart = '';
+      }
+      if (event.type === 'command-finished') {
+        optionsRef.current.onCommandFinished?.(lastCommandText, outputSinceCommandStart);
+      }
     });
 
     const inputDisposable = terminal.onData((input) => {
@@ -128,10 +154,12 @@ export function useTerminal(
 
     return () => {
       handleInputRef.current = null;
+      terminalRef.current = null;
       resizeObserver.disconnect();
       inputDisposable.dispose();
       offData();
       offExit();
+      offShellEvent();
       clearTimeout(analyzeTimer);
       terminal.dispose();
     };
@@ -143,5 +171,13 @@ export function useTerminal(
     }
   }, []);
 
-  return { insertText };
+  const clearCurrentLine = useCallback(() => {
+    void handleInputRef.current?.(CLEAR_LINE);
+  }, []);
+
+  const writeSystemLine = useCallback((text: string) => {
+    terminalRef.current?.write(`\r\n${text}\r\n`);
+  }, []);
+
+  return { insertText, clearCurrentLine, writeSystemLine };
 }
