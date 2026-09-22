@@ -23,13 +23,8 @@ Asked the project owner whether to install `gcc-c++` via
 confirmation was requested instead of running it directly). They preferred
 to install it themselves.
 
-## Status
+## Resolution
 
-Blocked on `npm install` until `gcc-c++` is available. Command the owner can
-run whenever they want:
-
-```
-sudo dnf install -y gcc-c++
-```
-
-Then re-run `npm install` at the project root.
+The project owner installed `gcc-c++` themselves. `npm install` now
+completes cleanly (131 packages, 0 vulnerabilities) and `node-pty` compiles
+its native addon successfully.

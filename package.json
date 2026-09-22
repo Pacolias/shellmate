@@ -2,7 +2,7 @@
   "name": "shellmate",
   "version": "0.1.0",
   "description": "A real terminal for Linux, surrounded by visual scaffolding that explains, protects and teaches — and fades away as you learn.",
-  "main": "./out/main/index.mjs",
+  "main": "./out/main/index.js",
   "author": "Pacolias",
   "license": "MIT",
   "private": true,
